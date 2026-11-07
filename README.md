@@ -1,36 +1,57 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# THE JOURNEY
 
-## Getting Started
+**The story of everything, and then there was you.** An immersive educational website and digital museum that tells 13.8 billion years of cosmic, geological, evolutionary and human history in ten chapters, built on cited evidence and ending with the visitor.
 
-First, run the development server:
+No accounts, no trackers, no database, no game mechanics. Every chapter is readable without JavaScript.
+
+## Running it
+
+Requires Node.js 20 or later.
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+npm run dev          # http://localhost:3000
+npm run build        # static production build
+npm start            # serve the build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SITE_URL` to the public origin before deploying. It is the only setting.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Checks
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+npm run check        # lint + typecheck + unit tests (Vitest)
+npm run build && npm run test:e2e   # browser tests (Playwright, desktop and mobile, with axe)
+```
 
-## Learn More
+`npm run build` also validates all content (`assertContentValid()`): unknown sources, glossary terms or exhibits, missing text alternatives and placeholder text fail the build.
 
-To learn more about Next.js, take a look at the following resources:
+## What is where
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+| Path | Purpose |
+| --- | --- |
+| `src/content/chapters/` | The ten chapters as typed data: sections, blocks, evidence, "go deeper" |
+| `src/content/exhibits/` | Exhibit definitions with full text alternatives |
+| `src/content/glossary/`, `src/content/methods/` | Glossary terms and the "How do we know?" methods |
+| `src/data/sources.ts` | Source registry: every citation, with what it supports and whether it was checked |
+| `src/data/timeline.ts`, `src/data/geologic-periods.ts` | Timeline events and period boundaries |
+| `src/components/exhibits/visuals/` | SVG and HTML visuals (maps, charts, diagrams), drawn from each exhibit's text |
+| `src/components/timeline/` | The interactive timeline |
+| `src/lib/` | Content schema, validation, inline markup, timeline scale, search |
+| `tests/unit`, `tests/e2e` | Vitest and Playwright suites |
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Content is separate from presentation: editors change files in `src/content` and `src/data`, never components. See [CONTENT_GUIDE.md](CONTENT_GUIDE.md).
 
-## Deploy on Vercel
+## Pages
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+`/` opening · `/journey` and `/journey/[chapter]` the ten chapters · `/timeline` interactive timeline with text list · `/evidence` how we know · `/sources` source directory · `/glossary` · `/search` · `/about`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Stack
+
+Next.js 15 (App Router, fully static), React 19, TypeScript, Tailwind CSS 4, next/font. Maps are rendered at build time from Natural Earth outlines (`world-atlas`, `d3-geo`); there are no map tiles or other runtime requests to third parties.
+
+## Further reading
+
+- [CONTENT_GUIDE.md](CONTENT_GUIDE.md): writing and editing content
+- [SOURCES.md](SOURCES.md): sourcing policy, verification status and open editorial items
+- [ACCESSIBILITY.md](ACCESSIBILITY.md): accessibility approach, testing and known limitations
