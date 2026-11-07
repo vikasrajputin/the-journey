@@ -5,6 +5,7 @@ import { ChapterIndex } from "@/components/journey/ChapterIndex";
 export const metadata: Metadata = {
   title: "The journey",
   description: "All ten chapters of THE JOURNEY, from the early universe to you.",
+  alternates: { canonical: "/journey" },
 };
 
 export default function JourneyPage() {

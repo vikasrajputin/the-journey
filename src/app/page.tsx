@@ -1,5 +1,8 @@
+import type { Metadata } from "next";
 import { OpeningHero } from "@/components/journey/OpeningHero";
 import { ChapterIndex } from "@/components/journey/ChapterIndex";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default function HomePage() {
   return (

@@ -16,7 +16,7 @@ export function SiteHeader() {
           THE JOURNEY
         </Link>
 
-        <nav aria-label="Primary" className="hidden md:block">
+        <nav aria-label="Primary" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {primaryNav.map((item) => (
               <li key={item.href}>
@@ -26,7 +26,7 @@ export function SiteHeader() {
           </ul>
         </nav>
 
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden lg:flex items-center gap-3">
           <MotionToggle />
           <Link
             href="/journey/before-everything"

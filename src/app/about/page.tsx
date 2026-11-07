@@ -4,6 +4,7 @@ import { PageIntro } from "@/components/layout/PageIntro";
 export const metadata: Metadata = {
   title: "About",
   description: "The editorial approach, authorship and limitations of THE JOURNEY.",
+  alternates: { canonical: "/about" },
 };
 
 export default function AboutPage() {

@@ -152,4 +152,5 @@ export const primaryNav = [
   { href: "/timeline", label: "Timeline" },
   { href: "/evidence", label: "Evidence" },
   { href: "/sources", label: "Sources" },
+  { href: "/search", label: "Search" },
 ] as const;
