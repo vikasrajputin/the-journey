@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getSource } from "@/data/sources";
+import { Artefacts } from "./Artefacts";
 import { useExperience } from "./ExperienceContext";
 import type { SceneDef } from "./scene-data";
 
@@ -25,7 +26,7 @@ export function SceneShell({
   onReport: (id: string, beat: number, active: boolean) => void;
   children: (s: SceneState) => React.ReactNode;
 }) {
-  const { media } = useExperience();
+  const { media, hearing } = useExperience();
   const ref = useRef<HTMLElement>(null);
   const progress = useRef(0);
   const [beat, setBeat] = useState(0);
@@ -104,6 +105,19 @@ export function SceneShell({
             <span className="scene-see-dot" aria-hidden="true" />
             {current.see}
           </p>
+          {def.sound && hearing === def.sound.media ? (
+            <p className="scene-hear">
+              <span className="scene-hear-bars" aria-hidden="true">
+                <i />
+                <i />
+                <i />
+              </span>
+              <span>
+                <span className="sr-only">You are hearing: </span>
+                {def.sound.label}
+              </span>
+            </p>
+          ) : null}
         </header>
 
         <div className="scene-captions">
@@ -119,6 +133,7 @@ export function SceneShell({
             See the proof
             {orgs.length ? <span className="scene-proof-orgs">· {orgs.join(" · ")}</span> : null}
           </button>
+          {def.artefacts?.length ? <Artefacts items={def.artefacts} sceneId={def.id} /> : null}
           <Link href={`/journey/${def.chapter}/`} className="scene-deeper">
             Go deeper <span aria-hidden="true">→</span>
             <span className="sr-only">: read chapter {def.number}, {def.title}</span>
@@ -130,7 +145,7 @@ export function SceneShell({
                 {credits.map((m) => (
                   <li key={m.id}>
                     <a href={m.page} target="_blank" rel="noopener noreferrer">
-                      {m.kind === "video" ? "Video" : "Photo"}: {m.credit}
+                      {m.kind === "video" ? "Video" : m.kind === "audio" ? "Sound" : "Photo"}: {m.credit}
                       <span className="sr-only"> (opens in a new tab)</span>
                     </a>
                   </li>
@@ -187,6 +202,39 @@ export function SceneShell({
                 </ul>
               </li>
             ))}
+            {def.sound ? (
+              <li>
+                <p className="proof-claim">What you hear</p>
+                <p className="proof-see" data-real="true">
+                  <span className="scene-see-dot" aria-hidden="true" />
+                  {def.sound.label}
+                </p>
+                <ul className="proof-sources">
+                  {media[def.sound.media] ? (
+                    <li>
+                      <a href={media[def.sound.media].page} target="_blank" rel="noopener noreferrer">
+                        The recording on Wikimedia Commons
+                        <span className="sr-only"> (opens in a new tab)</span>
+                      </a>
+                      <span className="proof-org"> · {media[def.sound.media].credit}</span>
+                    </li>
+                  ) : null}
+                  {def.sound.sources.map((id) => {
+                    const src = getSource(id);
+                    if (!src) return null;
+                    return (
+                      <li key={id}>
+                        <a href={src.url} target="_blank" rel="noopener noreferrer">
+                          {src.title}
+                          <span className="sr-only"> (opens in a new tab)</span>
+                        </a>
+                        <span className="proof-org"> · {src.organisation}</span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ) : null}
           </ol>
           <div className="proof-foot">
             <Link href={`/journey/${def.chapter}/#evidence`} className="scene-action-inline">

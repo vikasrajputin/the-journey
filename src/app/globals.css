@@ -24,7 +24,7 @@
   --color-border-light: var(--color-border-light);
   --color-chapter: var(--chapter-accent);
 
-  --font-display: var(--font-newsreader), "Iowan Old Style", "Palatino Linotype", Georgia, serif;
+  --font-display: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; /* one typeface throughout */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --breakpoint-xs: 30rem;

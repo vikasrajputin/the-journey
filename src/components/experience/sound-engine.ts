@@ -1,6 +1,6 @@
 /**
  * Procedural sound for the experience, built live with the Web Audio API.
- * Nothing here is a recording. Every soundscape is synthesised, and the
+ * Real recordings are layered on top by ambient.ts; nothing in this file is a recording. Every soundscape is synthesised, and the
  * dinosaur call is a labelled reconstruction, not a real animal sound.
  */
 
@@ -67,6 +67,13 @@ export class SoundEngine {
     const t = this.ctx.currentTime;
     this.master.gain.cancelScheduledValues(t);
     this.master.gain.setTargetAtTime(m ? 0 : 0.9, t, 0.15);
+  }
+
+  /** Lower the synthesised bed while a real recording plays over it. */
+  setBedLevel(v: number) {
+    const t = this.ctx.currentTime;
+    this.bed.gain.cancelScheduledValues(t);
+    this.bed.gain.setTargetAtTime(v, t, 0.8);
   }
 
   isMuted() {

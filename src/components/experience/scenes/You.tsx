@@ -6,6 +6,14 @@ import { useExperience } from "../ExperienceContext";
 import { MediaImage, useScrub } from "../Media";
 import type { SceneState } from "../SceneShell";
 import { band, lerp, rnd, useCanvasLoop } from "../useCanvasLoop";
+import { getSource } from "@/data/sources";
+
+const FACT_SOURCES: [string, string][] = [
+  ["nasa-sun-facts", "NASA"],
+  ["nhm-stardust", "Natural History Museum"],
+  ["si-300k", "Smithsonian"],
+  ["wang-2023-generations", "Science Advances (2023)"],
+];
 
 type Mote = { x: number; y: number; ox: number; oy: number; ph: number; s: number };
 
@@ -22,6 +30,8 @@ function lifeFacts(year: number) {
     km: age * 940e6, // one orbit of the Sun is about 940 million km
     beats: minutes * 80,
     cosmicSeconds: (age / 13.8e9) * 365.25 * 86400, // Sagan's cosmic calendar
+    galacticSeconds: (age / 230e6) * 365.25 * 86400, // one galactic year: the Sun's ~230-million-year lap of the Milky Way (NASA)
+    hydrogenTimes: 13.8e9 / age, // hydrogen was made in the Big Bang (NHM)
   };
 }
 
@@ -104,6 +114,30 @@ export function YouScene({ s }: { s: SceneState }) {
               </li>
               <li>
                 If all 13.8 billion years were squeezed into one year, your life so far would be the last <strong>{fmt(facts.cosmicSeconds, 2)} seconds</strong> of 31 December.
+              </li>
+              <li>
+                The Sun takes about 230 million years to circle the Milky Way. If one lap were one year, you would be <strong>{fmt(facts.galacticSeconds, 1)} seconds</strong> old.
+              </li>
+              <li>
+                The hydrogen in your body was made in the Big Bang. It is about <strong>{fmt(facts.hydrogenTimes / 1e6, 0)} million times</strong> older than you. Most of the rest of you, the carbon, oxygen, calcium and iron, was made inside stars.
+              </li>
+              <li>
+                About <strong>{fmt(300000 / 26.9, 0)} generations</strong> link you to the first people of our species, 300,000 years ago (at about 27 years a generation).
+              </li>
+              <li className="you-src">
+                Sources:{" "}
+                {FACT_SOURCES.map(([id, label], i) => {
+                  const src = getSource(id);
+                  return src ? (
+                    <span key={id}>
+                      {i ? ", " : ""}
+                      <a href={src.url} target="_blank" rel="noopener noreferrer">
+                        {label}
+                        <span className="sr-only"> (opens in a new tab)</span>
+                      </a>
+                    </span>
+                  ) : null;
+                })}
               </li>
             </ul>
           ) : null}

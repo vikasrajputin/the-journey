@@ -85,4 +85,22 @@ describe("immersive journey", () => {
       }
     }
   });
+
+  it("labels every real sound, registers its sources, and credits it in the scene", () => {
+    for (const scene of scenes) {
+      if (!scene.sound) continue;
+      expect(scene.sound.label).toMatch(/^Real (recording|data as sound)/);
+      expect(scene.media).toContain(scene.sound.media);
+      for (const id of scene.sound.sources) expect(getSource(id), `${scene.id}: ${id}`).toBeDefined();
+    }
+  });
+
+  it("points 3D specimens at the Smithsonian only", () => {
+    for (const scene of scenes) {
+      for (const a of scene.artefacts ?? []) {
+        expect(a.page).toMatch(/^https:\/\/3d\.si\.edu\/object\/3d\//);
+        expect(a.embed).toMatch(/^https:\/\/3d-api\.si\.edu\/voyager\/3d_package:/);
+      }
+    }
+  });
 });

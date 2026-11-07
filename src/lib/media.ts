@@ -9,7 +9,7 @@ import { createHash } from "node:crypto";
  */
 export type MediaItem = {
   id: string;
-  kind: "image" | "video";
+  kind: "image" | "video" | "audio";
   file: string; // Commons file title, without "File:"
   alt: string;
   credit: string;
@@ -17,7 +17,7 @@ export type MediaItem = {
 
 export type ResolvedMedia = MediaItem & {
   page: string;
-  src: string; // image: ~1920px thumbnail; video: poster frame
+  src: string; // image: ~1920px thumbnail; video: poster frame; audio: original file
   srcSmall: string; // ~960px for phones
   sources?: { src: string; type: string }[];
 };
@@ -45,6 +45,15 @@ const items: MediaItem[] = [
   { id: "city-lights", kind: "video", file: "Ocean Moon Glint and City Night Lights in 4K.webm", alt: "City lights and moonlight on the ocean, filmed from the International Space Station", credit: "NASA" },
   { id: "chandrayaan", kind: "image", file: "Chandrayaan-3 – Image of Vikram lander on lunar surface taken by Pragyan rover navcam at 1104 IST, 30 August 2023 from 15 meters away (without text).webp", alt: "India's Vikram lander on the Moon near its south pole, photographed by the Pragyan rover on 30 August 2023", credit: "ISRO" },
   { id: "black-marble", kind: "image", file: "BlackMarble20161km.jpg", alt: "Earth at night: city lights across every continent", credit: "NASA Earth Observatory" },
+  { id: "world-map", kind: "image", file: "Land shallow topo 2048.jpg", alt: "Flat map of the whole Earth from NASA's Blue Marble satellite images", credit: "NASA Visible Earth (Blue Marble)" },
+  // Real sound. Sonifications are real measurements turned into sound by NASA.
+  { id: "snd-perseus", kind: "audio", file: "Data Sonification- Black Hole at the Center of the Perseus Galaxy Cluster (X-ray).webm", alt: "Sonification: pressure waves from the black hole in the Perseus galaxy cluster", credit: "NASA / Chandra X-ray Center" },
+  { id: "snd-rain", kind: "audio", file: "Rain and thunder.ogg", alt: "Recording of rain and thunder", credit: "Wikimedia Commons (see file page)" },
+  { id: "snd-bloop", kind: "audio", file: "Bloop real.ogg", alt: "NOAA hydrophone recording of the Bloop, an icequake, 1997", credit: "NOAA" },
+  { id: "snd-waves", kind: "audio", file: "Oceanwavescrushing.ogg", alt: "Recording of ocean waves", credit: "Wikimedia Commons (see file page)" },
+  { id: "snd-birds", kind: "audio", file: "Birds forest.ogg", alt: "Recording of birdsong in a forest", credit: "Wikimedia Commons (see file page)" },
+  { id: "snd-fire", kind: "audio", file: "Campfire sound ambience.ogg", alt: "Recording of a crackling campfire", credit: "Freesound via Wikimedia Commons (see file page)" },
+  { id: "snd-voyager", kind: "audio", file: "Voyager Captures Sounds of Interstellar Space.webm", alt: "Voyager 1 plasma wave data from interstellar space, played as sound", credit: "NASA / JPL-Caltech" },
   { id: "pale-blue-dot", kind: "image", file: "Pale Blue Dot from Voyager 1 - PIA23645.png", alt: "The Pale Blue Dot: Earth as a single pixel in a sunbeam, photographed by Voyager 1 from about 6 billion km away", credit: "NASA / JPL-Caltech" },
 ];
 
@@ -65,6 +74,12 @@ function resolve(item: MediaItem): ResolvedMedia {
   const page = `https://commons.wikimedia.org/wiki/File:${enc}`;
   if (item.kind === "image") {
     return { ...item, page, src: filePath(enc, 1920), srcSmall: filePath(enc, 960) };
+  }
+  if (item.kind === "audio") {
+    const original = `${UP}/${dir}/${enc}`;
+    const type = item.file.endsWith(".webm") ? "audio/webm" : "audio/ogg";
+    // Wikimedia also makes an MP3 copy of sound files, which Safari can play.
+    return { ...item, page, src: original, srcSmall: original, sources: [{ src: original, type }, { src: `${UP}/transcoded/${dir}/${enc}/${enc}.mp3`, type: "audio/mpeg" }] };
   }
   const t = `${UP}/transcoded/${dir}/${enc}/${enc}`;
   return {

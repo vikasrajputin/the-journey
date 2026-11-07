@@ -1,4 +1,6 @@
-/** A field of gently twinkling background stars, in screen fractions. */
+import { tilt } from "../tilt";
+
+/** A field of gently twinkling background stars, in screen fractions. Bigger (nearer) stars shift more when the phone tilts. */
 export class Starfield {
   private stars: { x: number; y: number; s: number; p: number }[];
   constructor(n: number) {
@@ -8,8 +10,8 @@ export class Starfield {
     for (const st of this.stars) {
       const a = alpha * (0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * 1.3 + st.p)));
       ctx.fillStyle = `rgba(230,236,255,${a})`;
-      const x = ((st.x + drift * t * 0.002 * st.s) % 1) * w;
-      ctx.fillRect(x, st.y * h, st.s, st.s);
+      const x = ((st.x + drift * t * 0.002 * st.s) % 1) * w - tilt.x * st.s * 14;
+      ctx.fillRect(x, st.y * h - tilt.y * st.s * 14, st.s, st.s);
     }
   }
 }

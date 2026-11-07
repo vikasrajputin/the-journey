@@ -16,9 +16,22 @@ export type SceneDef = {
   length: number; // scene height, in screen heights
   soundscape: Soundscape;
   media: string[]; // media ids credited in this scene
+  /** A real recording or NASA sonification played under the scene, over the synthesised bed. */
+  sound?: { media: string; label: string; sources: string[] };
+  /** Real specimens scanned in 3D by the Smithsonian, loaded only when asked for. */
+  artefacts?: Artefact[];
   note?: string;
   beats: Beat[];
 };
+
+export type Artefact = { id: string; title: string; text: string; page: string; embed: string; credit: string };
+
+const si3d = (slug: string, uuid: string, rest: Omit<Artefact, "id" | "page" | "embed">): Artefact => ({
+  id: uuid,
+  page: `https://3d.si.edu/object/3d/${slug}:${uuid}`,
+  embed: `https://3d-api.si.edu/voyager/3d_package:${uuid}`,
+  ...rest,
+});
 
 /**
  * The words of the experience. Short on purpose: each line is a caption, and
@@ -34,7 +47,8 @@ export const scenes: SceneDef[] = [
     theme: "cosmos",
     length: 5,
     soundscape: "cosmos",
-    media: ["cmb", "pillars", "hubble-zoom"],
+    sound: { media: "snd-perseus", label: "Real data as sound: pressure waves from a black hole in the Perseus galaxy cluster, measured by NASA's Chandra telescope and raised 57 to 58 octaves so we can hear them", sources: ["nasa-bh-sonification"] },
+    media: ["snd-perseus", "cmb", "pillars", "hubble-zoom"],
     note: "Particle animation: an artistic impression of expansion and the first galaxies.",
     beats: [
       { at: 0, when: "13.8 billion years ago", text: "13.8 billion years ago, everything we can see was packed into a space hotter and denser than anything on Earth today.", sources: ["wmap-age", "planck-2018-params", "nasa-universe-overview"], real: false, see: "Simulation: the hot, dense early universe" },
@@ -53,7 +67,8 @@ export const scenes: SceneDef[] = [
     theme: "earth",
     length: 4.5,
     soundscape: "forge",
-    media: ["lava", "apollo17"],
+    sound: { media: "snd-rain", label: "Real recording: a thunderstorm", sources: [] },
+    media: ["snd-rain", "lava", "apollo17"],
     note: "Disc and impact animation: an artistic impression based on the leading scientific model.",
     beats: [
       { at: 0, when: "4.6 billion years ago", text: "4.6 billion years ago, a young Sun was circled by a disc of gas and dust.", sources: ["nasa-solar-system-form"], real: false, see: "Simulation: the young Solar System" },
@@ -71,7 +86,8 @@ export const scenes: SceneDef[] = [
     theme: "life",
     length: 4,
     soundscape: "deep",
-    media: ["black-smoker", "stromatolites"],
+    sound: { media: "snd-bloop", label: "Real recording: NOAA underwater microphones, 1997. The sound is ice cracking, played 16 times faster", sources: ["noaa-bloop"] },
+    media: ["snd-bloop", "black-smoker", "stromatolites"],
     note: "Cells are an artistic impression. The sea-floor vent and stromatolites are real photographs.",
     beats: [
       { at: 0, when: "At least 3.5 billion years ago", text: "At least 3.5 billion years ago, life began. One idea is that it started near hot vents on the deep sea floor, like this one.", sources: ["nhm-oldest-stromatolites", "nasa-astrobio-vents"], real: true, see: "Real photo: a black smoker vent on the Atlantic sea floor (NOAA)" },
@@ -88,7 +104,8 @@ export const scenes: SceneDef[] = [
     theme: "diversity",
     length: 4,
     soundscape: "ocean",
-    media: ["marrella"],
+    sound: { media: "snd-waves", label: "Real recording: waves on a shore", sources: [] },
+    media: ["snd-waves", "marrella"],
     note: "Swimming animals are artistic impressions of Cambrian life. The fossil is a real photograph.",
     beats: [
       { at: 0, when: "About 538 million years ago", text: "About 538 million years ago, animal life burst into new shapes.", sources: ["ics-chart", "nhm-cambrian"], real: false, see: "Simulation: an artist's impression of Cambrian sea life" },
@@ -105,7 +122,11 @@ export const scenes: SceneDef[] = [
     theme: "giants",
     length: 5.5,
     soundscape: "mesozoic",
-    media: ["sue"],
+    artefacts: [
+      si3d("tyrannosaurus-rex", "d8c62d28-4ebc-11ea-b77f-2e728ce88125", { title: "Tyrannosaurus rex and Triceratops", text: "The Smithsonian's 3D scan of its Tyrannosaurus rex and Triceratops fossils, from the National Museum of Natural History.", credit: "Smithsonian National Museum of Natural History" }),
+    ],
+    sound: { media: "snd-birds", label: "Real recording: birdsong. Birds are the dinosaurs that survived", sources: ["nhm-birds-dinosaurs"] },
+    media: ["snd-birds", "sue"],
     note: "Dinosaur sounds are reconstructions, synthesised in your browser. Nobody knows exactly what dinosaurs sounded like. The asteroid is an artistic impression.",
     beats: [
       { at: 0, when: "252 to 66 million years ago", text: "For about 165 million years, dinosaurs lived on every continent.", sources: ["nhm-when-dinosaurs", "ics-chart"], real: false, see: "Simulation: a Mesozoic forest" },
@@ -124,7 +145,13 @@ export const scenes: SceneDef[] = [
     theme: "human",
     length: 5.5,
     soundscape: "fire",
-    media: ["laetoli", "campfire", "hands"],
+    artefacts: [
+      si3d("sahelanthropus-tchadensis-cranium", "9730a62f-a649-44fb-8494-aa7c9b6eb1f8", { title: "Toumaï (Sahelanthropus tchadensis)", text: "A skull 7 to 6 million years old, found at Toros-Menalla, Chad, in 2001. One of the oldest known members of the human family tree.", credit: "Smithsonian Human Origins Program (3D scan of a cast)" }),
+      si3d("homo-erectus-cranium", "0b1d7e98-3dd0-4614-93d7-a2ae3cc9b11c", { title: "Homo erectus from Dmanisi, Georgia", text: "About 1.77 million years old: one of the earliest human skulls known from outside Africa.", credit: "Smithsonian Human Origins Program (3D scan of a cast; original at the Georgian National Museum)" }),
+      si3d("homo-sapiens-cranium", "09d681b2-5ae9-44a8-b444-8e31bb40305e", { title: "Cro-Magnon 1 (Homo sapiens)", text: "About 30,000 years old, from the Cro-Magnon rock shelter in France. A person of our own species.", credit: "Smithsonian Human Origins Program (3D scan of a cast; original at the Musée de l'Homme)" }),
+    ],
+    sound: { media: "snd-fire", label: "Real recording: a crackling campfire", sources: [] },
+    media: ["snd-fire", "laetoli", "campfire", "hands"],
     note: "Walking footprints and the hand stencil you make are animations. The footprint cast, fire and cave wall are real.",
     beats: [
       { at: 0, when: "About 3.6 million years ago", text: "About 3.6 million years ago in Tanzania, early humans walking upright left these footprints in wet volcanic ash.", sources: ["si-laetoli"], real: true, see: "Real cast: the Laetoli footprints, with animated steps" },
@@ -188,7 +215,8 @@ export const scenes: SceneDef[] = [
     theme: "you",
     length: 4,
     soundscape: "heart",
-    media: ["pale-blue-dot"],
+    sound: { media: "snd-voyager", label: "Real data as sound: the gas between the stars, picked up by Voyager 1 in 2012 and 2013, beyond the edge of our Solar System", sources: ["nasa-voyager-sounds"] },
+    media: ["snd-voyager", "pale-blue-dot"],
     beats: [
       { at: 0, when: "14 February 1990", text: "Voyager 1 took this photograph from the edge of the Solar System, about 6 billion kilometres from the Sun. That tiny dot in the sunbeam is Earth.", sources: ["nasa-pale-blue-dot"], real: true, see: "Real photo: the Pale Blue Dot, Voyager 1 (NASA/JPL)" },
       { at: 0.26, when: "Everyone, ever", text: "Every person who has ever lived, lived there.", sources: ["nasa-pale-blue-dot"], real: true, see: "Real photo: the Pale Blue Dot, Voyager 1 (NASA/JPL)" },

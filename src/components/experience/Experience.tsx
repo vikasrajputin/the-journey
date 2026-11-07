@@ -1,12 +1,16 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Fragment, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ResolvedMedia } from "@/lib/media";
 import { ExperienceContext, type ExperienceApi } from "./ExperienceContext";
 import { SceneShell } from "./SceneShell";
 import { scenes } from "./scene-data";
 import { SoundEngine, type Sfx } from "./sound-engine";
+import { AmbientPlayer } from "./ambient";
+import { LiveNow } from "./LiveNow";
+import { ScaleZoom } from "./ScaleZoom";
+import { askMotionPermission, buzz, startTilt, stopTilt } from "./tilt";
 import { Starfield } from "./scenes/Starfield";
 import { useCanvasLoop } from "./useCanvasLoop";
 import { MotionToggle } from "@/components/layout/MotionToggle";
@@ -35,23 +39,28 @@ const SCENE_COMPONENTS = {
   you: YouScene,
 } as const;
 
+/** Vibration on Android phones for the big physical moments. */
+const HAPTICS: Partial<Record<Sfx, number | number[]>> = {
+  step: 35,
+  impact: [90, 40, 220],
+  bang: [60, 30, 140],
+  roar: [25, 25, 25, 25, 60],
+};
+
 function GateSky() {
   const stars = useRef(new Starfield(320));
   const ref = useCanvasLoop((ctx, w, h, t) => {
-    ctx.fillStyle = "#020208";
+    ctx.fillStyle = "#050506";
     ctx.fillRect(0, 0, w, h);
     stars.current.draw(ctx, w, h, t, 1, 4);
-    const g = ctx.createRadialGradient(w / 2, h * 0.45, 0, w / 2, h * 0.45, Math.min(w, h) * 0.5);
-    g.addColorStop(0, `rgba(255,235,200,${0.1 + Math.sin(t) * 0.03})`);
-    g.addColorStop(1, "rgba(255,200,150,0)");
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, w, h);
   });
   return <canvas ref={ref} className="gate-sky" aria-hidden="true" />;
 }
 
 export function Experience({ media }: { media: Record<string, ResolvedMedia> }) {
   const engine = useRef<SoundEngine | null>(null);
+  const ambient = useRef<AmbientPlayer | null>(null);
+  const [hearing, setHearing] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const [entered, setEntered] = useState(false);
   const [sound, setSound] = useState(true);
@@ -72,10 +81,30 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     };
   }, []);
 
-  useEffect(() => () => engine.current?.dispose(), []);
+  useEffect(
+    () => () => {
+      engine.current?.dispose();
+      ambient.current?.dispose();
+      stopTilt();
+    },
+    [],
+  );
+
+  /** Real recording for a scene, over the synth bed; the bed comes back if it fails. */
+  const playReal = useCallback(
+    (sceneId: string) => {
+      const a = ambient.current;
+      if (!a) return;
+      const scene = scenes.find((s) => s.id === sceneId);
+      const m = scene?.sound ? media[scene.sound.media] : undefined;
+      a.play(m);
+    },
+    [media],
+  );
 
   const enter = (withSound: boolean) => {
     setSound(withSound);
+    void askMotionPermission().then((r) => r === "granted" && startTilt());
     if (!engine.current) {
       try {
         engine.current = new SoundEngine();
@@ -90,6 +119,14 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
       const scene = scenes.find((s) => s.id === currentRef.current.id) ?? scenes[0];
       e.play(scene.soundscape);
     }
+    if (!ambient.current) {
+      ambient.current = new AmbientPlayer((playing) => {
+        engine.current?.setBedLevel(playing ? 0.35 : 1);
+        setHearing(playing ? (scenes.find((s) => s.id === currentRef.current.id)?.sound?.media ?? null) : null);
+      });
+    }
+    ambient.current.setMuted(!withSound);
+    playReal(currentRef.current.id);
     setEntered(true);
     const target = scenes.find((s) => `#${s.id}` === window.location.hash);
     if (target) document.getElementById(target.id)?.scrollIntoView();
@@ -106,8 +143,11 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     setCurrent(next);
     const scene = scenes.find((s) => s.id === id);
     if (!scene) return;
-    if (c.id !== id) engine.current?.play(scene.soundscape);
-  }, []);
+    if (c.id !== id) {
+      engine.current?.play(scene.soundscape);
+      playReal(id);
+    }
+  }, [playReal]);
 
   const toggleSound = () => {
     const on = !sound;
@@ -117,6 +157,7 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
       return;
     }
     engine.current?.setMuted(!on);
+    ambient.current?.setMuted(!on);
     if (on) void engine.current?.resume();
   };
 
@@ -140,14 +181,19 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     [reduced],
   );
 
-  const sfx = useCallback((s: Sfx) => engine.current?.sfx(s), []);
+  const sfx = useCallback((s: Sfx) => {
+    engine.current?.sfx(s);
+    const pattern = HAPTICS[s];
+    if (pattern) buzz(pattern);
+  }, []);
 
-  const api: ExperienceApi = useMemo(() => ({ engine, sound, reduced, media, sfx, shake }), [sound, reduced, media, sfx, shake]);
+  const api: ExperienceApi = useMemo(() => ({ engine, sound, hearing, reduced, media, sfx, shake }), [sound, hearing, reduced, media, sfx, shake]);
   const currentScene = scenes.find((s) => s.id === current.id) ?? scenes[0];
 
   return (
     <ExperienceContext.Provider value={api}>
       <div className="experience" data-entered={entered || undefined}>
+        <div className="grain" aria-hidden="true" />
         <h1 className="sr-only">THE JOURNEY: 13.8 billion years, from the first light to you</h1>
         {!entered ? (
           <div className="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
@@ -211,10 +257,19 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
         <div ref={root} className="experience-world">
           {scenes.map((def) => {
             const Scene = SCENE_COMPONENTS[def.id as keyof typeof SCENE_COMPONENTS];
-            return (
+            const shell = (
               <SceneShell key={def.id} def={def} onReport={onReport}>
                 {(s) => <Scene s={s} />}
               </SceneShell>
+            );
+            // After "Our World": live data and the scale of everything, then "You".
+            if (def.id !== "world") return shell;
+            return (
+              <Fragment key={def.id}>
+                {shell}
+                <LiveNow />
+                <ScaleZoom />
+              </Fragment>
             );
           })}
         </div>
@@ -235,7 +290,7 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
             </ul>
             <h3 className="mt-14 font-display text-[length:var(--text-h3)]">Photographs, video and sound</h3>
             <p className="mt-3 max-w-2xl text-sm text-muted">
-              Photographs and video are real, from NASA, ESA, ISRO, NOAA and photographers on Wikimedia Commons, and load directly from Wikimedia. Animations are artistic impressions. Every sound is synthesised live in your browser. The dinosaur calls are reconstructions: nobody knows exactly what dinosaurs sounded like.
+              Photographs and video are real, from NASA, ESA, ISRO, NOAA and photographers on Wikimedia Commons, and load directly from Wikimedia. Animations are artistic impressions. Some sounds are real: recordings of rain, waves, birds and fire, a NOAA underwater recording, and NASA data from Voyager 1 and the Chandra telescope turned into sound. The rest is synthesised live in your browser. The dinosaur calls are reconstructions: nobody knows exactly what dinosaurs sounded like.
             </p>
             <ul className="outro-credits">
               {Object.values(media).map((m) => (

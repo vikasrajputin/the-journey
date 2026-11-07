@@ -20,7 +20,7 @@
   /* Accents: warm for key dates, links and focus; cool for secondary marks */
   --color-accent: #d6a96c; /* on night: ~9.3:1 */
   --color-accent-strong: #8a5a1c; /* accent for paper surfaces: ~5.4:1 */
-  --color-accent-cool: #83b7c7;
+  --color-accent-cool: #93afb8;
 
   /* Borders */
   --color-border-dark: rgb(255 255 255 / 0.14);
@@ -52,27 +52,27 @@
 }
 
 [data-theme="cosmos"] {
-  --chapter-accent: #b9a6e8;
+  --chapter-accent: #aea6c2;
   --chapter-glow: rgb(140 120 220 / 0.2);
 }
 [data-theme="earth"] {
-  --chapter-accent: #e39a6a;
+  --chapter-accent: #c99a7a;
   --chapter-glow: rgb(220 120 70 / 0.2);
 }
 [data-theme="life"] {
-  --chapter-accent: #7fc3b5;
+  --chapter-accent: #8fb3aa;
   --chapter-glow: rgb(80 180 160 / 0.18);
 }
 [data-theme="diversity"] {
-  --chapter-accent: #8fbf7f;
+  --chapter-accent: #9fb38f;
   --chapter-glow: rgb(110 170 90 / 0.18);
 }
 [data-theme="giants"] {
-  --chapter-accent: #c9b071;
+  --chapter-accent: #bfae84;
   --chapter-glow: rgb(190 160 80 / 0.18);
 }
 [data-theme="human"] {
-  --chapter-accent: #d9a27a;
+  --chapter-accent: #c8a185;
   --chapter-glow: rgb(200 140 100 / 0.18);
 }
 [data-theme="civilisation"] {
@@ -80,14 +80,14 @@
   --chapter-glow: rgb(214 169 108 / 0.18);
 }
 [data-theme="ideas"] {
-  --chapter-accent: #9fb8e0;
+  --chapter-accent: #a3b2c6;
   --chapter-glow: rgb(120 150 210 / 0.18);
 }
 [data-theme="built"] {
-  --chapter-accent: #83b7c7;
+  --chapter-accent: #93afb8;
   --chapter-glow: rgb(110 170 190 / 0.18);
 }
 [data-theme="you"] {
-  --chapter-accent: #e8c79a;
+  --chapter-accent: #d9c3a3;
   --chapter-glow: rgb(232 199 154 / 0.2);
 }
