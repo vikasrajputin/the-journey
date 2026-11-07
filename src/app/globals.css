@@ -24,7 +24,7 @@
   --color-border-light: var(--color-border-light);
   --color-chapter: var(--chapter-accent);
 
-  --font-display: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; /* one typeface throughout */
+  --font-display: var(--font-inter-tight), var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; /* one family throughout: Inter Tight for display, Inter for text */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
 
   --breakpoint-xs: 30rem;
@@ -63,9 +63,9 @@
   h3,
   h4 {
     font-family: var(--font-display);
-    font-weight: 400;
-    line-height: 1.1;
-    letter-spacing: -0.01em;
+    font-weight: 500;
+    line-height: 1.02;
+    letter-spacing: -0.035em;
     text-wrap: balance;
   }
 
