@@ -1,8 +1,9 @@
 /**
  * Shared parallax offset, -1 to 1 on each axis. On phones it follows the
  * gyroscope (tilt the phone to look around); with a mouse it follows the
- * pointer. Canvases read `tilt` every frame; photos and film read the CSS
- * variables --tx and --ty on <html>.
+ * pointer. Canvases read `tilt` every frame; photos and film in the active
+ * scene are moved directly (never through page-wide CSS variables, which
+ * would restyle the whole page every frame).
  */
 export const tilt = { x: 0, y: 0 };
 
@@ -35,15 +36,22 @@ export function startTilt() {
     target = { x: (e.clientX / window.innerWidth) * 2 - 1, y: (e.clientY / window.innerHeight) * 2 - 1 };
   };
   let raf = 0;
+  let wx = NaN;
+  let wy = NaN;
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
   const loop = () => {
-    const still = root.hasAttribute("data-motion") || window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    raf = requestAnimationFrame(loop);
+    const still = root.hasAttribute("data-motion") || reduce.matches;
     const tx = still ? 0 : target.x;
     const ty = still ? 0 : target.y;
     tilt.x += (tx - tilt.x) * 0.08;
     tilt.y += (ty - tilt.y) * 0.08;
-    root.style.setProperty("--tx", tilt.x.toFixed(3));
-    root.style.setProperty("--ty", tilt.y.toFixed(3));
-    raf = requestAnimationFrame(loop);
+    // Only touch the page when the shift is big enough to see (about 0.1px).
+    if (Math.abs(tilt.x - wx) < 0.006 && Math.abs(tilt.y - wy) < 0.006) return;
+    wx = tilt.x;
+    wy = tilt.y;
+    const t = `${(-tilt.x * 16).toFixed(1)}px ${(-tilt.y * 16).toFixed(1)}px`;
+    root.querySelectorAll<HTMLElement>(".scene[data-active] .parallax").forEach((el) => (el.style.translate = t));
   };
   window.addEventListener("deviceorientation", onOrient);
   window.addEventListener("pointermove", onPointer, { passive: true });

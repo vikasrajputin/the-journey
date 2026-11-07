@@ -36,9 +36,9 @@ export const MediaImage = forwardRef<HTMLDivElement, LayerProps>(function MediaI
         srcSet={`${m.srcSmall} 960w, ${m.src} 1920w`}
         sizes="100vw"
         alt={m.alt}
+        className={[kenburns && "kenburns", !className.includes("contain") && "parallax"].filter(Boolean).join(" ") || undefined}
         loading={priority ? "eager" : "lazy"}
         decoding="async"
-        className={kenburns ? "kenburns" : undefined}
         onError={() => setFailed(true)}
       />
     </div>
@@ -57,6 +57,11 @@ export const MediaVideo = forwardRef<HTMLDivElement, LayerProps & { play: boolea
   const m = media[id];
   const video = useRef<HTMLVideoElement>(null);
   const [failed, setFailed] = useState(false);
+  // Sources are added after mount so phones can ask for the 480p copy first:
+  // decoding 720p VP9 while canvases animate is a common cause of dropped frames.
+  const [small, setSmall] = useState<boolean | null>(null);
+  useEffect(() => setSmall(window.matchMedia("(max-width: 900px), (pointer: coarse)").matches), []);
+  const sources = small === null || !m?.sources ? [] : small ? [...m.sources].sort((a, b) => Number(b.src.includes(".480p.")) - Number(a.src.includes(".480p."))) : m.sources;
 
   useEffect(() => {
     const v = video.current;
@@ -89,10 +94,11 @@ export const MediaVideo = forwardRef<HTMLDivElement, LayerProps & { play: boolea
         preload="none"
         poster={m.src}
         aria-label={m.alt}
+        className={className.includes("contain") ? undefined : "parallax"}
         onError={() => setFailed(true)}
       >
-        {m.sources?.map((s, i) => (
-          <source key={i} src={s.src} type={s.type} onError={i === (m.sources?.length ?? 0) - 1 ? () => setFailed(true) : undefined} />
+        {sources.map((s, i) => (
+          <source key={s.src} src={s.src} type={s.type} onError={i === sources.length - 1 ? () => setFailed(true) : undefined} />
         ))}
       </video>
     </div>

@@ -6,13 +6,15 @@ export type Frame = (ctx: CanvasRenderingContext2D, w: number, h: number, t: num
 
 /**
  * Runs `frame` every animation frame while the canvas is on screen. The canvas
- * is sized to its box at up to 2x pixel density. Drawing uses CSS pixels.
+ * is sized to its box at up to 2x pixel density (1.25x on touch screens). Drawing uses CSS pixels.
  */
 export function useCanvasLoop(frame: Frame, opts: { maxDpr?: number } = {}) {
   const ref = useRef<HTMLCanvasElement>(null);
   const frameRef = useRef(frame);
   frameRef.current = frame;
-  const maxDpr = opts.maxDpr ?? 2;
+  // Phones have tiny pixels and small GPUs: a full-screen canvas at 3x is ~9x the
+  // work for little visible gain, so touch screens draw at up to 1.25x.
+  const maxDpr = opts.maxDpr ?? (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches ? 1.25 : 2);
 
   useEffect(() => {
     const canvas = ref.current;
