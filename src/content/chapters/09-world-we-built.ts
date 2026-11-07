@@ -33,7 +33,7 @@ export const chapter: Chapter = {
       blocks: [
         {
           type: "paragraph",
-          text: "In 1610, Galileo published telescope observations showing mountains on the Moon and moons orbiting Jupiter. Instruments like the telescope and microscope revealed worlds invisible to the naked eye. Over the following centuries, [[scientific-method|scientific methods]] matured: careful measurement, controlled experiments, mathematical models, publication, attempts to replicate results and open criticism by other experts, including [[peer-review]].",
+          text: "In 1610, Galileo published telescope observations of the Moon and of moons orbiting Jupiter. Instruments like the telescope and microscope revealed worlds invisible to the naked eye. Over the following centuries, [[scientific-method|scientific methods]] matured: careful measurement, controlled experiments, mathematical models, publication, attempts to replicate results and open criticism by other experts, including [[peer-review]].",
           sourceIds: ["museogalileo-sidereus", "nasa-planetary-motion"],
         },
         {

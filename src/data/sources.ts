@@ -3,8 +3,9 @@ import type { Source } from "@/lib/content-schema";
 /**
  * Source registry. Every entry was found on the publisher's own site, and its
  * title and URL are recorded as published. Entries move from "located" to
- * "checked" once an editor has re-read the page against the exact claim it
- * supports (Phase 5). Do not add an entry from memory.
+ * "checked" once the page has been re-read against the exact claim it
+ * supports. On 2026-11-07 every reachable page was checked this way; entries
+ * still marked "located" are on publisher sites that block automated reading. Do not add an entry from memory.
  */
 const ACCESSED = "2026-11-07";
 
@@ -19,26 +20,17 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Age of the universe (about 13.8 billion years) and the parameters of the standard cosmological model.",
-    note: "Primary research paper. Technical.",
+    note: "Primary research paper. The publisher page shows the abstract only; the age figure is in the full paper.",
   },
   {
     id: "wmap-age",
-    title: "How old is the universe? (WMAP Universe 101)",
-    organisation: "NASA Goddard Space Flight Center, WMAP mission",
-    url: "https://wmap.gsfc.nasa.gov/universe/uni_age.html",
+    title: "WMAP Overview",
+    organisation: "NASA Science, Wilkinson Microwave Anisotropy Probe mission",
+    url: "https://science.nasa.gov/mission/wmap/wmap-overview/",
     sourceType: "government",
-    verification: "located",
-    supports: "Plain-language explanation of how the age of the universe is measured.",
-    note: "Educational summary from a NASA mission team.",
-  },
-  {
-    id: "wmap-bbn",
-    title: "Tests of Big Bang: The Light Elements",
-    organisation: "NASA Goddard Space Flight Center, WMAP mission",
-    url: "https://wmap.gsfc.nasa.gov/universe/bb_tests_ele.html",
-    sourceType: "government",
-    verification: "located",
-    supports: "Primordial abundances of hydrogen, helium and lithium as evidence for the hot early universe.",
+    verification: "checked",
+    supports: "Age of the universe of 13.77 billion years, to about half a percent, from maps of the cosmic microwave background.",
+    note: "Replaces the mission's former Universe 101 pages, which now redirect here.",
   },
   {
     id: "esa-planck-cmb",
@@ -46,7 +38,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "European Space Agency",
     url: "https://www.esa.int/Science_Exploration/Space_Science/Planck/Planck_and_the_cosmic_microwave_background",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "The CMB as light released about 380,000 years after the Big Bang, when the universe became transparent.",
   },
   {
@@ -55,7 +47,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science, Hubble Space Telescope",
     url: "https://science.nasa.gov/mission/hubble/science/science-behind-the-discoveries/hubble-cosmological-redshift",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Redshift of distant galaxies as evidence that space is expanding.",
   },
   {
@@ -64,7 +56,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science, Astrobiology",
     url: "https://science.nasa.gov/astrobiology/learning-resources/alp/are-we-really-made-of-star-stuff/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Formation of elements in stars and stellar explosions, and the cosmic origin of the atoms in living things.",
   },
   {
@@ -73,7 +65,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/are-we-really-made-of-stardust.html",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Origin of the elements in the human body.",
     note: "Museum explainer.",
   },
@@ -83,7 +75,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science",
     url: "https://science.nasa.gov/universe/overview/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "General overview of the Big Bang model and cosmic history.",
   },
 
@@ -94,7 +86,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. Geological Survey",
     url: "https://pubs.usgs.gov/gip/geotime/age.html",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Earth's age of about 4.54 billion years, from radiometric dating of meteorites and the oldest minerals.",
   },
   {
@@ -103,7 +95,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. Geological Survey",
     url: "https://pubs.usgs.gov/gip/geotime/radiometric.html",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "How radioactive decay and half-lives are used to date rocks.",
   },
   {
@@ -112,7 +104,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "National Center for Science Education",
     url: "https://ncse.ngo/how-old-earth",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "Lines of evidence for Earth's age.",
   },
   {
@@ -123,7 +115,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     publicationDate: "2001",
     url: "https://ui.adsabs.harvard.edu/abs/2001Natur.409..175W/abstract",
     sourceType: "research",
-    verification: "located",
+    verification: "checked",
     supports: "Jack Hills zircon about 4.4 billion years old and its geochemical hints of liquid water.",
     note: "Primary research. Interpretation of early oceans remains discussed.",
   },
@@ -133,7 +125,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science, Astrobiology",
     url: "https://science.nasa.gov/astrobiology/learning-resources/alp/how-did-our-solar-system-form/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Formation of the Solar System from a collapsing cloud of gas and dust about 4.6 billion years ago.",
   },
   {
@@ -142,7 +134,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science, Astrobiology",
     url: "https://science.nasa.gov/astrobiology/learning-resources/alp/earth-right-after-it-formed/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Conditions on the young, hot Earth.",
   },
   {
@@ -151,7 +143,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science",
     url: "https://science.nasa.gov/moon/formation/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "The giant-impact model for the origin of the Moon and its open questions.",
   },
   {
@@ -160,7 +152,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/how-did-the-moon-form.html",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Evidence for and alternatives to the giant-impact model.",
   },
   {
@@ -169,7 +161,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. Geological Survey",
     url: "https://pubs.usgs.gov/publication/7000097",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Plate tectonics and the recycling of Earth's surface.",
   },
   {
@@ -178,7 +170,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. Geological Survey",
     url: "https://pubs.usgs.gov/publication/cir532",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Earth's layered structure: crust, mantle and core.",
   },
   {
@@ -188,7 +180,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     url: "https://stratigraphy.org/ICSchart/ChronostratChart2024-12.pdf",
     sourceType: "reference",
     publicationDate: "2024-12",
-    verification: "located",
+    verification: "checked",
     supports: "Boundary ages of geological eras and periods (e.g. Mesozoic 251.9 to 66.0 million years ago).",
     note: "The official geological time scale. Updated periodically; check for the latest version.",
   },
@@ -200,7 +192,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History",
     url: "https://naturalhistory.si.edu/education/teaching-resources/life-science/early-life-earth-animal-origins",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Overview of early microbial life, oxygenation and the origin of animals.",
   },
   {
@@ -212,7 +204,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Biosignatures about 3.5 billion years old in the Dresser Formation, Western Australia.",
-    note: "Single study; interpretation of very ancient biosignatures is an active research area.",
+    note: "Single study; interpretation of very ancient biosignatures is an active research area. The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "nutman-2016-isua",
@@ -223,7 +215,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "A proposed older (about 3.7 billion year) stromatolite record from Greenland.",
-    note: "Debated: later studies have questioned whether these structures are biological.",
+    note: "Debated: later studies have questioned whether these structures are biological. The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "nhm-oldest-stromatolites",
@@ -231,9 +223,9 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/press-office/press-releases/earth-s-oldest-stromatolites-help-in-the-search-for-ancient-life.html",
     sourceType: "museum",
-    verification: "located",
-    supports: "Stromatolites in Western Australia as among the oldest accepted evidence of life.",
-    note: "Press release.",
+    verification: "checked",
+    supports: "Stromatolites about 3.48 billion years old in the Dresser Formation, Western Australia.",
+    note: "Press release. It notes that the biological origin of these structures is still debated.",
   },
   {
     id: "nasa-goe",
@@ -241,7 +233,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Astrobiology",
     url: "https://astrobiology.nasa.gov/news/revisiting-earths-oxygenation-24-billion-years-ago/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "The Great Oxidation Event around 2.4 billion years ago and its uncertainties.",
   },
   {
@@ -253,6 +245,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Oxygenation as a drawn-out, uneven process rather than a single moment.",
+    note: "Only the title was readable automatically; needs a check by hand.",
   },
   {
     id: "nasa-what-is-life",
@@ -260,7 +253,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Science",
     url: "https://science.nasa.gov/universe/search-for-life/life-on-other-planets-what-is-life-and-what-does-it-need/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Working definitions of life and why defining it is difficult.",
   },
   {
@@ -269,7 +262,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Understanding Evolution, University of California Museum of Paleontology",
     url: "https://evolution.berkeley.edu/it-takes-teamwork-how-endosymbiosis-changed-life-on-earth/evidence-for-endosymbiosis/",
     sourceType: "university",
-    verification: "located",
+    verification: "checked",
     supports: "Evidence that mitochondria and chloroplasts descend from once free-living bacteria.",
   },
   {
@@ -278,7 +271,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Understanding Evolution, University of California Museum of Paleontology",
     url: "https://evolution.berkeley.edu/it-takes-teamwork-how-endosymbiosis-changed-life-on-earth/from-prokaryotes-to-eukaryotes/",
     sourceType: "university",
-    verification: "located",
+    verification: "checked",
     supports: "The origin of eukaryotic cells.",
   },
 
@@ -291,6 +284,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "university",
     verification: "located",
     supports: "Evolution as a branching process, not a ladder of progress.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "ue-misconceptions",
@@ -298,7 +292,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Understanding Evolution, University of California Museum of Paleontology",
     url: "https://evolution.berkeley.edu/teach-evolution/misconceptions-about-evolution/",
     sourceType: "university",
-    verification: "located",
+    verification: "checked",
     supports: "Common misunderstandings of natural selection, drift and common ancestry.",
   },
   {
@@ -307,8 +301,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Royal Ontario Museum",
     url: "https://burgess-shale.rom.on.ca/science/origin-of-animals-and-the-cambrian-explosion/the-cambrian-explosion/was-there-an-explosion-at-all/",
     sourceType: "museum",
-    verification: "located",
-    supports: "The Cambrian diversification and its earlier Ediacaran roots.",
+    verification: "checked",
+    supports: "Questions how sudden the Cambrian \"explosion\" really was.",
   },
   {
     id: "nhm-cambrian",
@@ -316,7 +310,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/the-cambrian-period.html",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Overview of Cambrian life.",
   },
   {
@@ -325,8 +319,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Understanding Evolution, University of California Museum of Paleontology",
     url: "https://evolution.berkeley.edu/what-are-evograms/the-origin-of-tetrapods/",
     sourceType: "university",
-    verification: "located",
-    supports: "Transitional fossils between fish and four-limbed vertebrates, including Tiktaalik.",
+    verification: "checked",
+    supports: "A series of Devonian fossils, about 390 to 360 million years old, documenting the move from water to land.",
   },
   {
     id: "nature-tiktaalik-news",
@@ -335,7 +329,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     publicationDate: "2006-04-05",
     url: "https://www.nature.com/news/2006/060403/full/news060403-7.html",
     sourceType: "research",
-    verification: "located",
+    verification: "checked",
     supports: "Discovery of Tiktaalik roseae, a Late Devonian fish with limb-like fins.",
     note: "News report on the primary research.",
   },
@@ -345,8 +339,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/what-is-mass-extinction-and-are-we-facing-a-sixth-one.html",
     sourceType: "museum",
-    verification: "located",
-    supports: "The five major mass extinctions and their aftermaths.",
+    verification: "checked",
+    supports: "The end-Permian as the largest known mass extinction (more than 95% of species), with volcanism as a likely cause, and the end-Cretaceous extinction of about 78% of species.",
   },
   {
     id: "si-extinction-over-time",
@@ -354,7 +348,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History",
     url: "https://naturalhistory.si.edu/education/teaching-resources/paleontology/extinction-over-time",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Extinction as a normal part of life's history, and the recoveries that followed mass extinctions.",
   },
   {
@@ -363,8 +357,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/how-trees-changed-the-world.html",
     sourceType: "museum",
-    verification: "located",
-    supports: "The spread of plants and forests on land.",
+    verification: "checked",
+    supports: "The oldest known fossil forest, from the Middle Devonian about 390 million years ago.",
   },
 
   /* ---------------- Giants ---------------- */
@@ -374,8 +368,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/when-did-dinosaurs-live.html",
     sourceType: "museum",
-    verification: "located",
-    supports: "Dinosaurs appearing in the Triassic (around 230 million years ago) and the Mesozoic periods.",
+    verification: "checked",
+    supports: "Non-avian dinosaurs lived through the Mesozoic and died out 66 million years ago. The page dates their first appearance to about 245 million years ago.",
   },
   {
     id: "nhm-dinosaur-origins",
@@ -383,7 +377,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/where-did-dinosaurs-come-from.html",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Origins of the earliest dinosaurs.",
   },
   {
@@ -392,7 +386,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/why-are-birds-the-only-surviving-dinosaurs.html",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Birds as living dinosaurs and their survival of the end-Cretaceous extinction.",
   },
   {
@@ -401,7 +395,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "American Museum of Natural History",
     url: "https://www.amnh.org/exhibitions/dinosaurs-ancient-fossils/extinction/dinosaurs-survive",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Which groups survived the end-Cretaceous extinction.",
   },
   {
@@ -410,7 +404,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/the-cretaceous-period.html",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Cretaceous environments, flowering plants, marine reptiles and mammals.",
   },
   {
@@ -422,7 +416,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Synthesis linking the Chicxulub impact to the end-Cretaceous mass extinction.",
-    note: "Review by a large author team; replies in the same journal argued for a larger role for volcanism.",
+    note: "Review by a large author team; replies in the same journal argued for a larger role for volcanism. The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "alvarez-1980",
@@ -434,6 +428,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Discovery of the iridium anomaly at the boundary layer and the impact hypothesis.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "renne-2013",
@@ -444,6 +439,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "High-precision radiometric dating of the boundary to about 66 million years ago.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "deccan-2019",
@@ -454,6 +450,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Ongoing research into the timing and role of Deccan Traps volcanism.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
 
   /* ---------------- Human story ---------------- */
@@ -463,7 +460,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History, Human Origins Program",
     url: "https://humanorigins.si.edu/education/introduction-human-evolution",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Overview of human evolution, common ancestry with other apes and the branching hominin record.",
   },
   {
@@ -472,7 +469,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History, Human Origins Program",
     url: "https://humanorigins.si.edu/education/frequently-asked-questions",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Humans did not evolve from chimpanzees; we share a common ancestor.",
   },
   {
@@ -481,7 +478,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History, Human Origins Program",
     url: "https://humanorigins.si.edu/evidence/human-fossils/species/sahelanthropus-tchadensis",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "A possible early hominin from about 7 to 6 million years ago, and debate over its status.",
   },
   {
@@ -494,6 +491,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "The oldest known stone tools, about 3.3 million years old.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "hublin-2017-irhoud",
@@ -504,6 +502,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Fossils dated to about 300,000 years ago attributed to early Homo sapiens.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "si-300k",
@@ -511,7 +510,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History, Human Origins Program",
     url: "https://humanorigins.si.edu/research/whats-hot-human-origins/our-species-arose-least-300000-years-ago",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Plain-language summary of the Jebel Irhoud findings.",
   },
   {
@@ -520,8 +519,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Natural History Museum, London",
     url: "https://www.nhm.ac.uk/discover/modern-humans-homo-sapiens-when-where-how-did-we-evolve.html",
     sourceType: "museum",
-    verification: "located",
-    supports: "Origin of Homo sapiens in Africa, dispersals and interbreeding with other hominins.",
+    verification: "checked",
+    supports: "The African origin of Homo sapiens and early movements out of Africa.",
   },
   {
     id: "green-2010-neandertal",
@@ -532,6 +531,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Genetic evidence of interbreeding between Neanderthals and the ancestors of many living people.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "si-ancient-dna",
@@ -539,8 +539,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History, Human Origins Program",
     url: "https://humanorigins.si.edu/evidence/genetics/ancient-dna-and-neanderthals",
     sourceType: "museum",
-    verification: "located",
-    supports: "What ancient DNA reveals about Neanderthals and interbreeding.",
+    verification: "checked",
+    supports: "Neanderthals contributed about 1 to 4% of the genomes of people of non-African descent.",
   },
   {
     id: "nobel-2022",
@@ -551,6 +551,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "reference",
     verification: "located",
     supports: "Sequencing of the Neanderthal genome, discovery of Denisovans and gene flow into modern humans.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "denisovan-review-2023",
@@ -561,6 +562,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Review of Denisovan genetics and their legacy in living populations.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "pnas-fire-europe",
@@ -571,6 +573,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Debate about when fire use became habitual.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "pnas-wonderwerk",
@@ -581,6 +584,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Evidence of fire about one million years ago at Wonderwerk Cave.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "si-dating",
@@ -588,7 +592,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Smithsonian National Museum of Natural History, Human Origins Program",
     url: "https://humanorigins.si.edu/evidence/dating",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Dating methods used in palaeoanthropology and their ranges.",
   },
 
@@ -601,7 +605,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     publicationDate: "2014",
     url: "https://www.pnas.org/doi/10.1073/pnas.1323964111",
     sourceType: "research",
-    verification: "located",
+    verification: "checked",
     supports: "Independent centres of plant and animal domestication and the protracted nature of the transition.",
   },
   {
@@ -613,6 +617,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Domestication of crops in many regions, and the slow pace of domestication traits.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "maize-2016",
@@ -623,6 +628,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Maize domestication in Mexico as a gradual process.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "pearl-millet-2018",
@@ -633,6 +639,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "research",
     verification: "located",
     supports: "Independent crop domestication in Africa.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "unesco-gobekli",
@@ -640,7 +647,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "UNESCO World Heritage Centre",
     url: "https://whc.unesco.org/en/list/1572/",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "Monumental structures built by hunter-gatherers in southeastern Anatolia.",
   },
   {
@@ -649,7 +656,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "UNESCO World Heritage Centre",
     url: "https://whc.unesco.org/en/list/138/",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "Urban planning of the Indus (Harappan) civilisation.",
   },
   {
@@ -658,7 +665,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "UNESCO World Heritage Centre",
     url: "https://whc.unesco.org/en/list/1114/",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "The late Shang capital and its oracle-bone inscriptions, among the earliest Chinese writing.",
   },
   {
@@ -667,8 +674,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "The Metropolitan Museum of Art",
     url: "https://www.metmuseum.org/essays/the-origins-of-writing",
     sourceType: "museum",
-    verification: "located",
-    supports: "Proto-cuneiform in Mesopotamia around 3200 BCE and its administrative origins.",
+    verification: "checked",
+    supports: "Early tablets from Uruk, about 3100 to 2900 BCE, mostly administrative; writing may have begun earlier.",
   },
   {
     id: "met-uruk",
@@ -676,7 +683,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "The Metropolitan Museum of Art",
     url: "https://www.metmuseum.org/essays/uruk-the-first-city",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Growth of Uruk as an early city.",
   },
   {
@@ -685,7 +692,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "The Metropolitan Museum of Art",
     url: "https://metmuseum.org/toah/hd/alban/hd_alban.htm",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Early writing and urbanism in the Oaxaca Valley, Mesoamerica.",
   },
   {
@@ -694,7 +701,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "The British Museum",
     url: "https://www.britishmuseum.org/exhibitions/hieroglyphs-unlocking-ancient-egypt/egyptian-hieroglyphs-decipherment-timeline",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Egyptian hieroglyphs and how they were deciphered.",
   },
 
@@ -706,7 +713,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     publicationDate: "2017",
     url: "https://www.glam.ox.ac.uk/article/carbon-dating-finds-bakhshali-manuscript-contains-oldest-recorded-origins-symbol-zero",
     sourceType: "university",
-    verification: "located",
+    verification: "checked",
     supports: "Radiocarbon dates for the Bakhshali manuscript and its zero placeholder.",
     note: "The dating results and their interpretation have been discussed by other scholars.",
   },
@@ -716,8 +723,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Mathematical Association of America, Convergence",
     url: "https://old.maa.org/press/periodicals/convergence/mathematical-treasures-plimpton-322",
     sourceType: "reference",
-    verification: "located",
-    supports: "An Old Babylonian tablet listing values related to right triangles.",
+    verification: "checked",
+    supports: "Plimpton 322 as an Old Babylonian tablet, and the debate over how to interpret it.",
     note: "Its purpose is debated among historians of mathematics.",
   },
   {
@@ -726,7 +733,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Library of Congress",
     url: "https://www.loc.gov/exhibits/exploring-the-early-americas/the-heavens-and-time.html",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Maya astronomy, calendars and the Dresden Codex.",
   },
   {
@@ -735,7 +742,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Library of Congress",
     url: "https://www.loc.gov/collections/islamic-manuscripts-from-mali/articles-and-essays/timbuktu-an-islamic-cultural-center/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Manuscript scholarship in Timbuktu and West Africa.",
   },
   {
@@ -744,8 +751,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Encyclopaedia Britannica",
     url: "https://www.britannica.com/place/Bayt-al-Hikmah",
     sourceType: "reference",
-    verification: "located",
-    supports: "The Abbasid-era House of Wisdom and the translation movement in Baghdad.",
+    verification: "checked",
+    supports: "Translation of Greek works into Arabic in 8th- and 9th-century Baghdad. The article notes this was not necessarily centred on the Bayt al-Hikmah itself.",
     note: "Encyclopedia entry; the institution's scale is discussed by historians.",
   },
   {
@@ -754,7 +761,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Israel Antiquities Authority, Leon Levy Dead Sea Scrolls Digital Library",
     url: "https://www.deadseascrolls.org.il/learn-about-the-scrolls/introduction?locale=en_US",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Discovery, dating and significance of the Dead Sea Scrolls for textual history.",
   },
   {
@@ -765,6 +772,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "museum",
     verification: "located",
     supports: "The Dunhuang Diamond Sutra, dated 868 CE, the earliest complete dated printed book.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "loc-gutenberg",
@@ -772,7 +780,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Library of Congress",
     url: "https://www.loc.gov/exhibits/bibles/the-gutenberg-bible.html",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Gutenberg's movable-type printing in Mainz in the 1450s.",
   },
   {
@@ -781,8 +789,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Museo Galileo",
     url: "https://www2.museogalileo.it/en/library-and-research-institute/projects/meet-galileo/38-works/464-sidereus-nuncius-the-starry-messenger-1610.html",
     sourceType: "museum",
-    verification: "located",
-    supports: "Galileo's 1610 telescopic observations.",
+    verification: "checked",
+    supports: "Galileo's 1610 Sidereus Nuncius: telescopic observations of the Moon and of four moons of Jupiter.",
   },
   {
     id: "nasa-planetary-motion",
@@ -790,7 +798,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Earth Observatory",
     url: "https://science.nasa.gov/earth/earth-observatory/planetary-motion/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "From Copernicus to Kepler and Newton.",
   },
 
@@ -801,8 +809,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "American Society of Mechanical Engineers",
     url: "https://www.asme.org/about-asme/engineering-history/landmarks/111-boulton-watt-rotative-steam-engine",
     sourceType: "reference",
-    verification: "located",
-    supports: "Watt's improvements to the steam engine in the 1700s.",
+    verification: "checked",
+    supports: "Watt's improvements to the steam engine, including the separate condenser, shown in a Boulton & Watt engine of 1785.",
   },
   {
     id: "owid-energy-200",
@@ -810,7 +818,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Our World in Data",
     url: "https://ourworldindata.org/global-energy-200-years",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "Long-run growth of global primary energy use, based on Vaclav Smil and Energy Institute data.",
     note: "Data compilation; pre-1965 values are estimates.",
   },
@@ -820,7 +828,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Our World in Data",
     url: "https://ourworldindata.org/data-insights/global-average-life-expectancy-has-more-than-doubled-since-1900",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "Long-run changes in life expectancy.",
     note: "Historical estimates carry wide uncertainty.",
   },
@@ -830,7 +838,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Our World in Data",
     url: "https://ourworldindata.org/microbes-battle-science-vaccines",
     sourceType: "reference",
-    verification: "located",
+    verification: "checked",
     supports: "Role of germ theory, sanitation and vaccines in reducing infectious disease.",
   },
   {
@@ -839,7 +847,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Computer History Museum",
     url: "https://www.computerhistory.org/timeline/computers/",
     sourceType: "museum",
-    verification: "located",
+    verification: "checked",
     supports: "Key developments in computing.",
   },
   {
@@ -848,7 +856,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "CERN",
     url: "https://home.cern/science/computing/the-birth-of-the-web/short-history-web/",
     sourceType: "research",
-    verification: "located",
+    verification: "checked",
     supports: "Tim Berners-Lee's 1989 proposal for the World Wide Web at CERN.",
   },
   {
@@ -858,7 +866,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     publicationDate: "2023-01",
     url: "https://nvlpubs.nist.gov/nistpubs/ai/nist.ai.100-1.pdf",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "A plain description of AI systems and the risks and governance they call for.",
   },
   {
@@ -868,7 +876,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     publicationDate: "2023",
     url: "https://www.ipcc.ch/report/ar6/syr/summary-for-policymakers/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Human activities have unequivocally caused global warming; observed impacts and risks.",
   },
 
@@ -879,7 +887,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Oxford Radiocarbon Accelerator Unit, University of Oxford",
     url: "https://c14.arch.ox.ac.uk/dating.html",
     sourceType: "university",
-    verification: "located",
+    verification: "checked",
     supports: "How radiocarbon dating works and its practical age limit of around 50,000 years.",
   },
   {
@@ -890,6 +898,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "reference",
     verification: "located",
     supports: "History and principle of radiocarbon dating.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "usgs-decay-age",
@@ -897,8 +906,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. Geological Survey",
     url: "https://www.usgs.gov/educational-resources/geologic-age-using-radioactive-decay-determine-geologic-age",
     sourceType: "government",
-    verification: "located",
-    supports: "Choosing isotopes with suitable half-lives for different ages.",
+    verification: "checked",
+    supports: "Half-lives of the radioactive isotopes used as geological clocks.",
   },
   {
     id: "nps-relative-dating",
@@ -906,8 +915,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. National Park Service",
     url: "https://www.nps.gov/articles/000/grcatime-timescale.htm",
     sourceType: "government",
-    verification: "located",
-    supports: "Superposition, relative dating and how numeric ages are attached.",
+    verification: "checked",
+    supports: "Relative and numeric dating of rock layers.",
   },
   {
     id: "nps-archaeology-dating",
@@ -915,7 +924,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "U.S. National Park Service",
     url: "https://www.nps.gov/articles/000/how-do-archeologists-date-sites-and-artifacts.htm",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Stratigraphy and dating methods in archaeology.",
   },
   {
@@ -924,7 +933,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NASA Earth Observatory",
     url: "https://science.nasa.gov/earth/earth-observatory/paleoclimatology-the-ice-core-record/",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "What ice cores record about past climate and atmosphere.",
   },
   {
@@ -933,7 +942,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "NOAA National Centers for Environmental Information",
     url: "https://www.ncei.noaa.gov/news/what-are-proxy-data",
     sourceType: "government",
-    verification: "located",
+    verification: "checked",
     supports: "Proxy records such as ice and sediment cores, tree rings and corals.",
   },
   {
@@ -944,6 +953,7 @@ const raw: Omit<Source, "accessedDate">[] = [
     sourceType: "reference",
     verification: "located",
     supports: "How molecular clocks work and why they need fossil calibration.",
+    note: "The publisher blocks automated checking, so this entry still needs a check by hand.",
   },
   {
     id: "ucmp-taphonomy",
@@ -951,8 +961,8 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "University of California Museum of Paleontology",
     url: "https://ucmp.berkeley.edu/education/explorations/tours/fossil/guide/taphonomy1.html",
     sourceType: "university",
-    verification: "located",
-    supports: "How organisms become fossils and why the record is incomplete.",
+    verification: "checked",
+    supports: "Why most remains are destroyed before they can fossilise, so the fossil record is incomplete.",
   },
   {
     id: "ue-chronology",
@@ -960,8 +970,69 @@ const raw: Omit<Source, "accessedDate">[] = [
     organisation: "Understanding Evolution, University of California Museum of Paleontology",
     url: "https://evolution.berkeley.edu/lines-of-evidence/distribution-in-time-and-space/chronology/",
     sourceType: "university",
-    verification: "located",
+    verification: "checked",
     supports: "Using the order of fossils in rock layers as evidence.",
+  },
+
+  /* ---------------- Added during Phase 5 checks ---------------- */
+  {
+    id: "nhm-spread-out-of-africa",
+    title: "When and how did modern humans spread out of Africa and around the world?",
+    organisation: "Natural History Museum, London",
+    url: "https://www.nhm.ac.uk/discover/when-how-did-modern-humans-homo-sapiens-spread-out-of-africa.html",
+    sourceType: "museum",
+    verification: "checked",
+    supports: "Main dispersal from Africa within roughly the last 60,000 years, earlier dispersals, arrival in Australia around 42,000 years ago (possibly about 65,000) and in the Americas by about 15,000 years ago, with footprints of 23,000 to 21,000 years ago.",
+    note: "Museum summary; arrival dates are actively debated.",
+  },
+  {
+    id: "higham-2014-neanderthal",
+    title: "The timing and spatiotemporal patterning of Neanderthal disappearance",
+    organisation: "Higham et al., Nature (record at the Australian National University research portal)",
+    publicationDate: "2014",
+    url: "https://researchportalplus.anu.edu.au/en/publications/the-timing-and-spatiotemporal-patterning-of-neanderthal-disappear/",
+    sourceType: "research",
+    verification: "checked",
+    supports: "End of the Neanderthal-associated Mousterian across Europe between about 41,000 and 39,000 calibrated years ago.",
+  },
+  {
+    id: "casselman-plimpton",
+    title: "The Babylonian tablet Plimpton 322",
+    organisation: "Bill Casselman, Department of Mathematics, University of British Columbia",
+    url: "https://personal.math.ubc.ca/~cass/courses/m446-03/pl322/pl322.html",
+    sourceType: "university",
+    verification: "checked",
+    supports: "Plimpton 322 dated to around 1800 BCE.",
+    note: "Teaching page by a university mathematician.",
+  },
+  {
+    id: "bm-uruk-tablet",
+    title: "The first writing: counting beer for the workers",
+    organisation: "The British Museum, via Google Arts & Culture",
+    url: "https://artsandculture.google.com/asset/the-first-writing-counting-beer-for-the-workers/fgF9ioy89DC2Uw",
+    sourceType: "museum",
+    verification: "checked",
+    supports: "An early administrative clay tablet from Mesopotamia dated around 3100 to 3000 BCE.",
+  },
+  {
+    id: "britannica-observable-universe",
+    title: "Observable universe",
+    organisation: "Encyclopaedia Britannica",
+    url: "https://www.britannica.com/print/article/2215399",
+    sourceType: "reference",
+    verification: "checked",
+    supports: "The observable universe is roughly 93 billion light-years across.",
+  },
+  {
+    id: "cfa-jwst-early-galaxies",
+    title: "JWST Draws Back Curtain on Universe's Early Galaxies",
+    organisation: "Center for Astrophysics | Harvard & Smithsonian",
+    publicationDate: "2022-11-17",
+    url: "https://cfa.harvard.edu/index.php/news/jwst-draws-back-curtain-universes-early-galaxies",
+    sourceType: "university",
+    verification: "checked",
+    supports: "Webb observations of unexpectedly bright galaxies a few hundred million years after the Big Bang, challenging models of galaxy formation.",
+    note: "News release about specific early results; later studies continue to refine them.",
   },
 ];
 
