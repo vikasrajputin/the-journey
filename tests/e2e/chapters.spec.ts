@@ -78,3 +78,17 @@ test("a chapter card grows into its chapter and leaves nothing covering the page
   await expect(page.locator(".expand-clone")).toHaveCount(0);
   await expect(page.locator("html")).not.toHaveAttribute("data-expanding", "");
 });
+
+test("each chapter opens with a flight into its era that can be skipped, and is left out when motion is reduced", async ({ page }) => {
+  await page.goto("/journey/age-of-giants");
+  const warp = page.locator(".warp");
+  await expect(warp).toBeVisible();
+  await expect(warp).toContainText("252 to 66 million years ago");
+  await expect(warp).toContainText("Artist’s impression");
+  await page.getByRole("link", { name: "Skip the flight" }).click();
+  await expect.poll(() => page.evaluate(() => Math.round(document.getElementById("chapter-start")!.getBoundingClientRect().top))).toBeLessThan(200);
+
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.reload();
+  await expect(warp).toBeHidden();
+});

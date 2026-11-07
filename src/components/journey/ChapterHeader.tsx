@@ -29,7 +29,7 @@ function ChapterHero({ slug }: { slug: string }) {
 /** Chapter opening: number, title, time, central question, cinematic statement and orientation. */
 export function ChapterHeader({ chapter }: { chapter: Chapter }) {
   return (
-    <header className="relative isolate flex min-h-[92svh] flex-col justify-end overflow-hidden border-b border-border-dark">
+    <header id="chapter-start" className="relative isolate flex min-h-[92svh] flex-col justify-end overflow-hidden border-b border-border-dark">
       <ChapterBackdrop theme={chapter.theme} />
       <ChapterHero slug={chapter.slug} />
       <ExpandLanding />
