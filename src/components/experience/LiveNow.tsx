@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useExperience } from "./ExperienceContext";
+import { SplitWords } from "@/components/motion/SplitWords";
 
 type Iss = { latitude: number; longitude: number; altitude: number; velocity: number; visibility: string };
 type Epic = { image: string; date: string; caption: string; centroid_coordinates: { lat: number; lon: number } };
@@ -101,8 +102,8 @@ export function LiveNow() {
     <section ref={ref} className="live" aria-labelledby="live-title">
       <div className="live-inner">
         <p className="scene-eyebrow">Right now</p>
-        <h2 id="live-title" className="scene-title">
-          Above you, today
+        <h2 id="live-title" className="scene-title" data-reveal>
+          <SplitWords text="Above you, today" />
         </h2>
         <p className="live-intro">Live data, fetched as you read this. Nothing here is a simulation.</p>
 

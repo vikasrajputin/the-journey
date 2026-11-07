@@ -1,4 +1,5 @@
 import type { Chapter } from "@/lib/content-schema";
+import { SplitWords } from "@/components/motion/SplitWords";
 import Link from "next/link";
 import { chapters } from "@/data/navigation";
 import { ChapterBackdrop } from "./ChapterBackdrop";
@@ -46,7 +47,7 @@ export function ChapterHeader({ chapter }: { chapter: Chapter }) {
           Chapter {chapter.number} <span className="text-muted">of {chapters.length}</span>
         </p>
         <h1 id="chapter-title" className="mt-4 max-w-5xl font-display text-[length:var(--text-h1)] leading-[0.98]">
-          {chapter.title}
+          <SplitWords text={chapter.title} className="split-load" />
         </h1>
         <p className="mt-5 max-w-2xl text-[length:var(--text-lead)] text-text-light/80">{chapter.subtitle}</p>
 
