@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { getGlossaryEntry } from "@/content/glossary";
 
 export const glossaryPopoverId = (id: string) => `glossary-${id}`;
@@ -39,9 +40,9 @@ export function GlossaryPopovers({ ids }: { ids: Iterable<string> }) {
             </div>
             <h2 id={`${popId}-title`} className="font-display text-2xl">{entry.term}</h2>
             <p className="mt-3 text-text-light/90">{entry.definition}</p>
-            <a href={`/glossary#${entry.id}`} className="link-quiet mt-4 inline-block text-sm text-accent">
+            <Link href={`/glossary#${entry.id}`} className="link-quiet mt-4 inline-block text-sm text-accent">
               Open the full glossary
-            </a>
+            </Link>
           </div>
         );
       })}

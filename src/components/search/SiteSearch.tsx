@@ -27,7 +27,7 @@ export function SiteSearch({ records }: { records: SearchRecord[] }) {
 
   return (
     <div className="search-js">
-      <form role="search" action="/search" onSubmit={(e) => e.preventDefault()}>
+      <form role="search" action={`${process.env.NEXT_PUBLIC_BASE_PATH ?? ""}/search`} onSubmit={(e) => e.preventDefault()}>
         <label htmlFor={id} className="eyebrow text-muted">
           Search the exhibition
         </label>

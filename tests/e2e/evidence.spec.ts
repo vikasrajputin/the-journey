@@ -43,5 +43,5 @@ test("sitemap and robots are served", async ({ request }) => {
   const sitemap = await (await request.get("/sitemap.xml")).text();
   expect(sitemap).toContain("/journey/before-everything");
   expect(await (await request.get("/robots.txt")).text()).toContain("Sitemap:");
-  expect((await request.get("/opengraph-image")).headers()["content-type"]).toContain("image/png");
+  expect((await request.get("/og.png")).headers()["content-type"]).toContain("image/png");
 });
