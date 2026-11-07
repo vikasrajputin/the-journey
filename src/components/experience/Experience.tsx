@@ -6,7 +6,7 @@ import type { ResolvedMedia } from "@/lib/media";
 import { ExperienceContext, type ExperienceApi } from "./ExperienceContext";
 import { SceneShell } from "./SceneShell";
 import { scenes } from "./scene-data";
-import { Narrator, SoundEngine, type Sfx } from "./sound-engine";
+import { SoundEngine, type Sfx } from "./sound-engine";
 import { Starfield } from "./scenes/Starfield";
 import { useCanvasLoop } from "./useCanvasLoop";
 import { MotionToggle } from "@/components/layout/MotionToggle";
@@ -35,22 +35,6 @@ const SCENE_COMPONENTS = {
   you: YouScene,
 } as const;
 
-function readPref(key: string, fallback: boolean) {
-  try {
-    const v = localStorage.getItem(key);
-    return v === null ? fallback : v === "1";
-  } catch {
-    return fallback;
-  }
-}
-function writePref(key: string, v: boolean) {
-  try {
-    localStorage.setItem(key, v ? "1" : "0");
-  } catch {
-    /* storage unavailable */
-  }
-}
-
 function GateSky() {
   const stars = useRef(new Starfield(320));
   const ref = useCanvasLoop((ctx, w, h, t) => {
@@ -68,15 +52,12 @@ function GateSky() {
 
 export function Experience({ media }: { media: Record<string, ResolvedMedia> }) {
   const engine = useRef<SoundEngine | null>(null);
-  const narrator = useRef<Narrator | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const [entered, setEntered] = useState(false);
   const [sound, setSound] = useState(true);
-  const [voice, setVoice] = useState(true);
   const [reduced, setReduced] = useState(false);
   const [current, setCurrent] = useState<{ id: string; beat: number }>({ id: scenes[0].id, beat: 0 });
   const currentRef = useRef(current);
-  const sayTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -85,17 +66,13 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     mq.addEventListener("change", update);
     const mo = new MutationObserver(update);
     mo.observe(document.documentElement, { attributes: true, attributeFilter: ["data-motion"] });
-    setVoice(readPref("journey:voice", true));
     return () => {
       mq.removeEventListener("change", update);
       mo.disconnect();
     };
   }, []);
 
-  useEffect(() => () => {
-    engine.current?.dispose();
-    narrator.current?.stop();
-  }, []);
+  useEffect(() => () => engine.current?.dispose(), []);
 
   const enter = (withSound: boolean) => {
     setSound(withSound);
@@ -106,10 +83,6 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
         engine.current = null;
       }
     }
-    if (!narrator.current && Narrator.supported()) {
-      narrator.current = new Narrator();
-      narrator.current.onSpeaking = (on) => engine.current?.duck(on);
-    }
     const e = engine.current;
     if (e) {
       void e.resume();
@@ -117,13 +90,11 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
       const scene = scenes.find((s) => s.id === currentRef.current.id) ?? scenes[0];
       e.play(scene.soundscape);
     }
-    if (narrator.current) narrator.current.enabled = withSound && voice;
     setEntered(true);
     const target = scenes.find((s) => `#${s.id}` === window.location.hash);
     if (target) document.getElementById(target.id)?.scrollIntoView();
     else window.scrollTo({ top: 0 });
     const scene = target ?? scenes[0];
-    if (withSound && voice) setTimeout(() => narrator.current?.say(scene.beats[0].text), 900);
     document.getElementById(scene.id + "-title")?.focus({ preventScroll: true });
   };
 
@@ -136,11 +107,6 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     const scene = scenes.find((s) => s.id === id);
     if (!scene) return;
     if (c.id !== id) engine.current?.play(scene.soundscape);
-    clearTimeout(sayTimer.current);
-    narrator.current?.stop();
-    sayTimer.current = setTimeout(() => {
-      if (currentRef.current === next) narrator.current?.say(scene.beats[beat].text);
-    }, 650);
   }, []);
 
   const toggleSound = () => {
@@ -152,23 +118,6 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     }
     engine.current?.setMuted(!on);
     if (on) void engine.current?.resume();
-    if (narrator.current) {
-      narrator.current.enabled = on && voice;
-      if (!on) narrator.current.stop();
-    }
-  };
-
-  const toggleVoice = () => {
-    const on = !voice;
-    setVoice(on);
-    writePref("journey:voice", on);
-    if (narrator.current) {
-      narrator.current.enabled = on && sound;
-      if (on && sound) {
-        const scene = scenes.find((s) => s.id === currentRef.current.id);
-        if (scene) narrator.current.say(scene.beats[currentRef.current.beat].text);
-      } else narrator.current.stop();
-    }
   };
 
   const shake = useCallback(
@@ -193,7 +142,7 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
 
   const sfx = useCallback((s: Sfx) => engine.current?.sfx(s), []);
 
-  const api: ExperienceApi = useMemo(() => ({ engine, narrator, sound, reduced, media, sfx, shake }), [sound, reduced, media, sfx, shake]);
+  const api: ExperienceApi = useMemo(() => ({ engine, sound, reduced, media, sfx, shake }), [sound, reduced, media, sfx, shake]);
   const currentScene = scenes.find((s) => s.id === current.id) ?? scenes[0];
 
   return (
@@ -236,10 +185,6 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
             <button type="button" className="hud-btn" aria-pressed={sound} onClick={toggleSound} title={sound ? "Sound on" : "Sound off"}>
               {sound ? <IconSound /> : <IconMute />}
               <span className="sr-only">Sound</span>
-            </button>
-            <button type="button" className="hud-btn" aria-pressed={voice} onClick={toggleVoice} title={voice ? "Narration on" : "Narration off"} disabled={!sound}>
-              <IconVoice off={!voice} />
-              <span className="sr-only">Narration</span>
             </button>
             <MotionToggle className="hud-btn hud-motion" />
             <Link href="/journey/" className="hud-btn hud-text">
@@ -290,7 +235,7 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
             </ul>
             <h3 className="mt-14 font-display text-[length:var(--text-h3)]">Photographs, video and sound</h3>
             <p className="mt-3 max-w-2xl text-sm text-muted">
-              Photographs and video are real, from NASA, ESA, ISRO, NOAA and photographers on Wikimedia Commons, and load directly from Wikimedia. Animations are artistic impressions. Every sound is synthesised live in your browser. The dinosaur calls are reconstructions: nobody knows exactly what dinosaurs sounded like. The narration uses your device&rsquo;s own voice.
+              Photographs and video are real, from NASA, ESA, ISRO, NOAA and photographers on Wikimedia Commons, and load directly from Wikimedia. Animations are artistic impressions. Every sound is synthesised live in your browser. The dinosaur calls are reconstructions: nobody knows exactly what dinosaurs sounded like.
             </p>
             <ul className="outro-credits">
               {Object.values(media).map((m) => (
@@ -323,15 +268,6 @@ function IconMute() {
     <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
       <path d="M4 9v6h4l5 4V5L8 9H4z" fill="currentColor" stroke="none" />
       <path d="M16 9l5 6M21 9l-5 6" />
-    </svg>
-  );
-}
-function IconVoice({ off }: { off: boolean }) {
-  return (
-    <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
-      <rect x="3" y="5" width="18" height="14" rx="3" />
-      <path d="M7 10h4M7 14h7M14 10h3" />
-      {off ? <path d="M3 21L21 3" /> : null}
     </svg>
   );
 }

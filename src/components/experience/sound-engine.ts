@@ -25,7 +25,7 @@ const rand = (a: number, b: number) => a + Math.random() * (b - a);
 export class SoundEngine {
   readonly ctx: AudioContext;
   private master: GainNode;
-  private bed: GainNode; // soundscapes, ducked under narration
+  private bed: GainNode; // soundscapes
   private fx: GainNode;
   private verb: ConvolverNode;
   private white: AudioBuffer;
@@ -71,11 +71,6 @@ export class SoundEngine {
 
   isMuted() {
     return this.muted;
-  }
-
-  /** Lower the soundscape while the narrator speaks. */
-  duck(on: boolean) {
-    this.bed.gain.setTargetAtTime(on ? 0.35 : 1, this.ctx.currentTime, 0.3);
   }
 
   play(id: Soundscape) {
@@ -480,46 +475,5 @@ export class SoundEngine {
         this.burst(d, { type: "bandpass", f0: 3000, q: 0.8, a: 0.05, d: 0.35, v: 0.12 });
         break;
     }
-  }
-}
-
-/** Narration with the browser's own speech voices. */
-export class Narrator {
-  private voice?: SpeechSynthesisVoice;
-  enabled = true;
-  onSpeaking?: (speaking: boolean) => void;
-
-  static supported() {
-    return typeof window !== "undefined" && "speechSynthesis" in window;
-  }
-
-  constructor() {
-    if (!Narrator.supported()) return;
-    const pick = () => {
-      const voices = speechSynthesis.getVoices();
-      const en = voices.filter((v) => v.lang.toLowerCase().startsWith("en"));
-      const pref = ["Google UK English Male", "Daniel", "Arthur", "Microsoft Ryan", "Google UK English Female", "Serena", "Karen", "Samantha"];
-      this.voice = pref.map((n) => en.find((v) => v.name.includes(n))).find(Boolean) ?? en.find((v) => v.lang === "en-GB") ?? en[0];
-    };
-    pick();
-    speechSynthesis.addEventListener?.("voiceschanged", pick);
-  }
-
-  say(text: string) {
-    if (!this.enabled || !Narrator.supported()) return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    if (this.voice) u.voice = this.voice;
-    u.lang = this.voice?.lang ?? "en-GB";
-    u.rate = 0.92;
-    u.pitch = 0.95;
-    u.onstart = () => this.onSpeaking?.(true);
-    u.onend = u.onerror = () => this.onSpeaking?.(false);
-    speechSynthesis.speak(u);
-  }
-
-  stop() {
-    if (Narrator.supported()) speechSynthesis.cancel();
-    this.onSpeaking?.(false);
   }
 }

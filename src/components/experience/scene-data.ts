@@ -22,7 +22,7 @@ export type SceneDef = {
 
 /**
  * The words of the experience. Short on purpose: each line is a caption, and
- * the narrator reads it aloud. Every claim here is drawn from the chapter text,
+ * there is no narration. Every claim here is drawn from the chapter text,
  * which carries the sources.
  */
 export const scenes: SceneDef[] = [

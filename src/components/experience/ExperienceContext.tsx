@@ -2,11 +2,10 @@
 
 import { createContext, useContext } from "react";
 import type { ResolvedMedia } from "@/lib/media";
-import type { Narrator, Sfx, SoundEngine } from "./sound-engine";
+import type { Sfx, SoundEngine } from "./sound-engine";
 
 export type ExperienceApi = {
   engine: React.RefObject<SoundEngine | null>;
-  narrator: React.RefObject<Narrator | null>;
   sound: boolean;
   reduced: boolean;
   media: Record<string, ResolvedMedia>;
