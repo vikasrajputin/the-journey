@@ -526,3 +526,335 @@ html[data-motion] .warp {
   background: #fff;
   color: #0b0e16;
 }
+
+/* ---------- Chapter opening reel: slides right to left as you scroll ---------- */
+.reel {
+  position: relative;
+  border-bottom: 1px solid var(--color-border-dark);
+  padding-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
+}
+.reel-stage {
+  position: relative;
+  overflow-x: auto;
+  scroll-snap-type: x proximity;
+  padding: clamp(5rem, 4rem + 3vw, 7rem) 0 2rem;
+  overscroll-behavior-x: contain;
+}
+.reel-track {
+  display: flex;
+  align-items: stretch;
+  gap: clamp(1rem, 0.6rem + 1.5vw, 2rem);
+  width: max-content;
+  padding: 0 var(--gutter);
+  transform-origin: 50% 50%;
+}
+.reel-panel {
+  position: relative;
+  flex: none;
+  height: min(76svh, 46rem);
+  scroll-snap-align: center;
+}
+/* Live: the stage sticks below the header and chapter bar, and the page scrolls it sideways. */
+.reel-scroll[data-live] {
+  height: var(--reel-h, 300vh);
+}
+.reel-scroll[data-live] .reel-stage {
+  position: sticky;
+  top: calc(var(--header-height) + 2.5rem);
+  height: calc(100svh - var(--header-height) - 2.5rem);
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  padding: 0;
+}
+.reel-scroll[data-live] .reel-track {
+  height: 100%;
+  align-items: center;
+  will-change: transform;
+}
+.reel-scroll[data-live] .reel-panel {
+  height: min(84%, 48rem);
+}
+.reel-scroll[data-live] .reel-stage::after {
+  content: "";
+  position: absolute;
+  left: var(--gutter);
+  right: var(--gutter);
+  bottom: 1rem;
+  height: 3px;
+  border-radius: 3px;
+  background: linear-gradient(var(--chapter-accent), var(--chapter-accent)) 0 0 / calc(var(--reel-p, 0) * 100%) 100% no-repeat, rgb(255 255 255 / 0.12);
+}
+
+.reel-intro {
+  isolation: isolate;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: min(36rem, 86vw);
+  padding-right: 1rem;
+}
+.reel-h1 {
+  margin-top: 0.75rem;
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 1.5rem + 4.2vw, 5.75rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.045em;
+}
+.reel-sub {
+  margin-top: 1rem;
+  font-size: var(--text-lead);
+  line-height: 1.4;
+  color: var(--color-text-light);
+  opacity: 0.85;
+}
+.reel-when {
+  align-self: flex-start;
+  margin-top: 1.25rem;
+  padding: 0.35rem 0.85rem;
+  border-radius: 999px;
+  background: var(--chapter-accent);
+  color: #0b0e16;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.reel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1.25rem;
+  margin-top: 1.75rem;
+}
+.reel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 3rem;
+  padding: 0 1.5rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #0b0e16;
+  font-weight: 700;
+  transition: transform 0.3s var(--ease-out);
+}
+.reel-btn:hover {
+  transform: scale(1.04);
+}
+.reel-link {
+  font-size: 0.875rem;
+  color: var(--color-text-light);
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.reel-hint {
+  margin-top: 2rem;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--chapter-accent);
+}
+.reel-hint span {
+  display: inline-block;
+  animation: reel-nudge 1.4s ease-in-out infinite;
+}
+@keyframes reel-nudge {
+  50% {
+    transform: translateX(6px);
+  }
+}
+
+.reel-card {
+  isolation: isolate;
+  width: min(64vw, 62rem);
+  overflow: hidden;
+  border-radius: 1.75rem;
+  background: var(--chapter-glow);
+  margin: 0;
+}
+@media (max-width: 760px) {
+  .reel-card {
+    width: 84vw;
+    border-radius: 1.25rem;
+  }
+}
+.reel-media {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  z-index: -1;
+}
+.reel-media > div,
+.reel-media > video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  background-size: cover;
+  background-position: center;
+  transform: scale(1.18);
+}
+.reel-card::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: linear-gradient(180deg, rgb(8 11 18 / 0.1) 30%, rgb(8 11 18 / 0.85) 100%), linear-gradient(90deg, rgb(8 11 18 / 0.55), transparent 65%);
+  pointer-events: none;
+}
+.reel-over {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  display: grid;
+  justify-items: start;
+  gap: 0.55rem;
+  max-width: 40rem;
+  padding: clamp(1.25rem, 0.8rem + 2vw, 2.5rem);
+}
+.reel-num {
+  padding: 0.25rem 0.75rem;
+  border-radius: 999px;
+  background: var(--chapter-accent);
+  color: #0b0e16;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+.reel-kicker {
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.reel-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 1.1rem + 2.6vw, 3.6rem);
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.035em;
+  color: #fff;
+}
+.reel-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  color: #fff;
+  font-size: clamp(0.95rem, 0.9rem + 0.25vw, 1.1rem);
+  line-height: 1.45;
+}
+.reel-read {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  margin-top: 0.25rem;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.6);
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background 0.3s, color 0.3s;
+}
+.reel-read:hover,
+.reel-read:focus-visible {
+  background: #fff;
+  color: #0b0e16;
+}
+.reel-credit {
+  position: absolute;
+  top: 0.9rem;
+  right: 0.9rem;
+  max-width: min(60%, 26rem);
+  padding: 0.3rem 0.7rem;
+  border-radius: 0.75rem;
+  background: rgb(8 11 18 / 0.7);
+  color: rgb(255 255 255 / 0.9);
+  font-size: 0.68rem;
+  line-height: 1.35;
+}
+.reel-quote {
+  max-width: 34rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.3rem, 0.9rem + 1.6vw, 2.4rem);
+  font-style: italic;
+  line-height: 1.2;
+  color: #fff;
+  text-shadow: 0 2px 24px rgb(0 0 0 / 0.5);
+}
+.reel-plain {
+  background:
+    radial-gradient(60% 70% at 85% 15%, color-mix(in srgb, var(--chapter-accent) 42%, transparent), transparent 70%),
+    linear-gradient(140deg, color-mix(in srgb, var(--chapter-accent) 22%, #0b0e16), #0b0e16 70%);
+}
+.reel-plain::after {
+  background: linear-gradient(180deg, transparent 40%, rgb(8 11 18 / 0.6));
+}
+.reel-bignum {
+  position: absolute;
+  top: -0.06em;
+  right: 0.12em;
+  z-index: -1;
+  font-family: var(--font-display);
+  font-size: clamp(9rem, 4rem + 18vw, 24rem);
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.06em;
+  color: transparent;
+  -webkit-text-stroke: 2px color-mix(in srgb, var(--chapter-accent) 70%, transparent);
+}
+.reel-next {
+  width: min(34rem, 80vw);
+}
+.reel-next-link {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  height: 100%;
+  padding: clamp(1.5rem, 1rem + 2vw, 2.75rem);
+  border-radius: 1.75rem;
+  background: #f4f2ee;
+  color: #0b0e16;
+  transition: background 0.5s var(--ease-out);
+}
+.reel-next-link:hover,
+.reel-next-link:focus-visible {
+  background: var(--chapter-accent);
+}
+.reel-next-label {
+  font-size: 0.8rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.reel-next-title {
+  font-family: var(--font-display);
+  font-size: clamp(2.2rem, 1.4rem + 3vw, 4.5rem);
+  font-weight: 500;
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+}
+.reel-next-arrow {
+  font-size: 2.5rem;
+  transition: transform 0.5s var(--ease-out);
+}
+.reel-next-link:hover .reel-next-arrow {
+  transform: translateX(0.75rem);
+}
+.reel-facts {
+  padding-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+}
+.reel-opening {
+  max-width: 48rem;
+  font-family: var(--font-display);
+  font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem);
+  font-style: italic;
+  line-height: 1.2;
+  color: var(--color-text-light);
+}
