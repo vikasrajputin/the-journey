@@ -604,3 +604,19 @@ html[data-motion="reduce"] *::after {
   html:not([data-js]) .source-filter { display: none; }
   [data-source-item][hidden], [data-source-group][hidden] { display: none; }
 }
+
+/* ---------- Search ---------- */
+@layer components {
+  html:not([data-js]) .search-js { display: none; }
+  html[data-js] .search-nojs { display: none; }
+  .search-result {
+    display: block;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 0.9rem;
+    background: var(--color-ink);
+    transition: border-color 150ms;
+  }
+  .search-result:hover { border-color: var(--color-accent); }
+  .search-result mark { background: rgb(214 169 108 / 0.25); color: var(--color-text-light); border-radius: 2px; padding: 0 1px; }
+}

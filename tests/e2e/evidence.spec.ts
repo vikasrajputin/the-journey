@@ -30,3 +30,18 @@ test("the source directory groups and filters sources", async ({ page }) => {
   const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
+
+test("search finds passages and links to them", async ({ page }) => {
+  await page.goto("/search?q=Neanderthals");
+  await expect(page.getByRole("searchbox")).toHaveValue("Neanderthals");
+  await expect(page.getByText(/results for “Neanderthals”/)).toBeVisible();
+  await page.locator(".search-result").first().click();
+  await expect(page).not.toHaveURL(/\/search/);
+});
+
+test("sitemap and robots are served", async ({ request }) => {
+  const sitemap = await (await request.get("/sitemap.xml")).text();
+  expect(sitemap).toContain("/journey/before-everything");
+  expect(await (await request.get("/robots.txt")).text()).toContain("Sitemap:");
+  expect((await request.get("/opengraph-image")).headers()["content-type"]).toContain("image/png");
+});

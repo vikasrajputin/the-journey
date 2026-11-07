@@ -33,6 +33,7 @@ export function SiteFooter() {
               <li><Link href="/timeline" className="link-quiet">The full timeline</Link></li>
               <li><Link href="/evidence" className="link-quiet">How do we know?</Link></li>
               <li><Link href="/sources" className="link-quiet">Sources</Link></li>
+              <li><Link href="/search" className="link-quiet">Search</Link></li>
               <li><Link href="/about" className="link-quiet">About this project</Link></li>
             </ul>
           </nav>

@@ -1,7 +1,7 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
-const routes = ["/", "/journey", "/journey/before-everything", "/journey/you", "/timeline", "/evidence", "/sources", "/about", "/glossary"];
+const routes = ["/", "/journey", "/journey/before-everything", "/journey/you", "/timeline", "/evidence", "/sources", "/about", "/glossary", "/search"];
 
 for (const route of routes) {
   test(`${route} loads without console errors or accessibility violations`, async ({ page }) => {
@@ -70,4 +70,18 @@ test("mobile menu opens, navigates and closes with Escape", async ({ page, isMob
   await dialog.getByRole("link", { name: /The Age of Giants/ }).click();
   await expect(page).toHaveURL(/\/journey\/age-of-giants$/);
   await expect(dialog).toBeHidden();
+});
+
+test("no page scrolls sideways from phone to wide desktop", async ({ browser }) => {
+  const pages = ["/", "/timeline", "/evidence", "/sources", "/journey/civilisation", "/search?q=moon"];
+  for (const width of [360, 768, 1024, 1920]) {
+    const context = await browser.newContext({ viewport: { width, height: 900 } });
+    const page = await context.newPage();
+    for (const route of pages) {
+      await page.goto(route);
+      const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+      expect(overflow, `${route} at ${width}px`).toBeLessThanOrEqual(0);
+    }
+    await context.close();
+  }
 });
