@@ -1,75 +1,161 @@
-import type { Chapter } from "@/lib/content-schema";
-import { SplitWords } from "@/components/motion/SplitWords";
 import Link from "next/link";
-import { chapters } from "@/data/navigation";
-import { ChapterBackdrop } from "./ChapterBackdrop";
-import { media } from "@/lib/media";
+import type { Block, Chapter } from "@/lib/content-schema";
+import { SplitWords } from "@/components/motion/SplitWords";
+import { chapters, getAdjacentChapters } from "@/data/navigation";
+import { scenes } from "@/components/experience/scene-data";
+import { getGlossaryEntry } from "@/content/glossary";
+import { toPlainText } from "@/lib/rich-text";
+import { media, type ResolvedMedia } from "@/lib/media";
 import { heroMedia } from "@/lib/chapter-media";
+import { ChapterBackdrop } from "./ChapterBackdrop";
 import { ExpandLanding } from "./ExpandLanding";
+import { ReelTrack } from "./ReelTrack";
 
+const plain = (s: string) => toPlainText(s, (id) => getGlossaryEntry(id)?.term).replace(/\*/g, "");
 
-/** Full-bleed photograph or video behind the chapter title. A failed load leaves the painted backdrop. */
-function ChapterHero({ slug }: { slug: string }) {
-  const h = heroMedia[slug];
-  const m = h ? media[h.media] : undefined;
-  if (!m) return null;
-  return (
-    <div className="chapter-hero" aria-hidden="true">
-      {m.kind === "video" ? (
-        <video autoPlay muted loop playsInline preload="metadata" poster={m.src}>
-          {m.sources?.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
-        </video>
-      ) : (
-        <div className="chapter-hero-img" style={{ backgroundImage: `url("${m.src}")` }} />
-      )}
-    </div>
+/** A short taste of a section: the start of its first lead or paragraph, cut at a word. */
+function excerpt(blocks: Block[], max = 170) {
+  const b = blocks.find((x) => x.type === "lead" || x.type === "paragraph");
+  if (!b || !("text" in b)) return "";
+  const t = plain(b.text);
+  return t.length > max ? t.slice(0, max).replace(/\s+\S*$/, "") + "…" : t;
+}
+
+function Pic({ m, className = "" }: { m: ResolvedMedia; className?: string }) {
+  return m.kind === "video" ? (
+    <video className={className} autoPlay muted loop playsInline preload="metadata" poster={m.src}>
+      {m.sources?.map((s) => <source key={s.src} src={s.src} type={s.type} />)}
+    </video>
+  ) : (
+    <div className={className} style={{ backgroundImage: `url("${m.src}")` }} />
   );
 }
 
-/** Chapter opening: number, title, time, central question, cinematic statement and orientation. */
+/**
+ * The chapter's opening as a reel that slides from right to left as you
+ * scroll down: the title, the chapter's main picture, a card for each part
+ * of the chapter, and the next chapter at the end. Without JavaScript, or
+ * with reduced motion, it is a row you can swipe or scroll sideways.
+ */
 export function ChapterHeader({ chapter }: { chapter: Chapter }) {
+  const hero = media[heroMedia[chapter.slug]?.media ?? ""];
+  const more = (scenes.find((s) => s.chapter === chapter.slug)?.media ?? [])
+    .filter((id) => id !== heroMedia[chapter.slug]?.media)
+    .map((id) => media[id])
+    .filter((m): m is ResolvedMedia => !!m && m.kind !== "audio");
+  const { next } = getAdjacentChapters(chapter.slug);
+
   return (
-    <header id="chapter-start" className="relative isolate flex min-h-[92svh] flex-col justify-end overflow-hidden border-b border-border-dark">
-      <ChapterBackdrop theme={chapter.theme} />
-      <ChapterHero slug={chapter.slug} />
+    <header id="chapter-start" className="reel" aria-labelledby="chapter-title">
       <ExpandLanding />
-      <div className="container-wide relative pt-28 pb-14 md:pt-40 md:pb-20">
-        <p className="eyebrow text-chapter">
-          Chapter {chapter.number} <span className="text-muted">of {chapters.length}</span>
-        </p>
-        <h1 id="chapter-title" className="mt-4 max-w-5xl font-display text-[length:var(--text-h1)] leading-[0.98]">
-          <SplitWords text={chapter.title} className="split-load" />
-        </h1>
-        <p className="mt-5 max-w-2xl text-[length:var(--text-lead)] text-text-light/80">{chapter.subtitle}</p>
+      <ReelTrack>
+        <div className="reel-panel reel-intro">
+          <ChapterBackdrop theme={chapter.theme} />
+          <p className="eyebrow text-chapter">
+            Chapter {chapter.number} <span className="text-muted">of {chapters.length}</span>
+          </p>
+          <h1 id="chapter-title" className="reel-h1">
+            <SplitWords text={chapter.title} className="split-load" />
+          </h1>
+          <p className="reel-sub">{chapter.subtitle}</p>
+          <p className="reel-when">{chapter.orientation.when}</p>
+          <p className="reel-actions">
+            <Link href={`/#${heroMedia[chapter.slug]?.scene ?? ""}`} className="reel-btn">
+              <span aria-hidden="true">▶</span> Experience this chapter
+            </Link>
+            <Link href={`/timeline?chapter=${chapter.slug}`} className="reel-link">
+              See this chapter on the full timeline →
+            </Link>
+          </p>
+          <p className="reel-hint" aria-hidden="true">
+            Scroll <span>→</span>
+          </p>
+        </div>
 
-        <p className="mt-12 max-w-3xl font-display text-2xl italic leading-snug text-text-light md:text-4xl">
-          {chapter.opening}
-        </p>
+        {hero ? (
+          <figure className="reel-panel reel-card reel-hero">
+            <div className="reel-media chapter-hero" aria-hidden="true">
+              <Pic m={hero} className={hero.kind === "video" ? "" : "chapter-hero-img"} />
+            </div>
+            <div className="reel-over">
+              <p className="reel-quote">{chapter.opening}</p>
+            </div>
+            <figcaption className="reel-credit">
+              Picture: {hero.alt}. {hero.credit}
+            </figcaption>
+          </figure>
+        ) : null}
 
-        <dl className="mt-12 grid max-w-5xl gap-px overflow-hidden rounded-xl border border-border-dark bg-border-dark text-sm sm:grid-cols-3">
-          <div className="bg-night/85 p-4 backdrop-blur-sm md:p-5">
+        {chapter.sections.map((s, i) => {
+          const m = more[i];
+          return (
+            <article key={s.id} className={`reel-panel reel-card${m ? "" : " reel-plain"}`} aria-labelledby={`reel-${s.id}`}>
+              {m ? (
+                <div className="reel-media" aria-hidden="true">
+                  <Pic m={m} />
+                </div>
+              ) : (
+                <span className="reel-bignum" aria-hidden="true">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+              )}
+              <div className="reel-over">
+                <span className="reel-num">Part {i + 1}</span>
+                {s.kicker ? <p className="reel-kicker">{s.kicker}</p> : null}
+                <h2 id={`reel-${s.id}`} className="reel-title">
+                  {s.title}
+                </h2>
+                <p className="reel-text">{excerpt(s.blocks)}</p>
+                <a href={`#${s.id}`} className="reel-read">
+                  Read this part <span aria-hidden="true">↓</span>
+                </a>
+              </div>
+              {m ? (
+                <p className="reel-credit">
+                  Picture: {m.alt}. {m.credit}
+                </p>
+              ) : null}
+            </article>
+          );
+        })}
+
+        <div className="reel-panel reel-next">
+          {next ? (
+            <Link href={`/journey/${next.slug}`} className="reel-next-link" data-theme={next.theme}>
+              <span className="reel-next-label">Next chapter</span>
+              <span className="reel-next-title">{next.title}</span>
+              <span className="reel-next-arrow" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          ) : (
+            <Link href="/journey/" className="reel-next-link">
+              <span className="reel-next-label">You reached the end</span>
+              <span className="reel-next-title">See all chapters</span>
+              <span className="reel-next-arrow" aria-hidden="true">
+                →
+              </span>
+            </Link>
+          )}
+        </div>
+      </ReelTrack>
+
+      <div className="container-wide reel-facts">
+        <p className="reel-opening">{chapter.opening}</p>
+        <dl className="mt-10 grid max-w-5xl gap-px overflow-hidden rounded-xl border border-border-dark bg-border-dark text-sm sm:grid-cols-3">
+          <div className="bg-night p-4 md:p-5">
             <dt className="eyebrow text-chapter">When</dt>
             <dd className="mt-2 text-text-light/90">{chapter.orientation.when}</dd>
           </div>
-          <div className="bg-night/85 p-4 backdrop-blur-sm md:p-5">
+          <div className="bg-night p-4 md:p-5">
             <dt className="eyebrow text-chapter">Where</dt>
             <dd className="mt-2 text-text-light/90">{chapter.orientation.where}</dd>
           </div>
-          <div className="bg-night/85 p-4 backdrop-blur-sm md:p-5">
+          <div className="bg-night p-4 md:p-5">
             <dt className="eyebrow text-chapter">Scale</dt>
             <dd className="mt-2 text-text-light/90">{chapter.orientation.scale}</dd>
           </div>
         </dl>
-        <p className="mt-8">
-          <Link href={`/#${heroMedia[chapter.slug]?.scene ?? ""}`} className="inline-flex min-h-12 items-center gap-2 rounded-full bg-accent px-6 font-semibold text-night hover:scale-[1.03] transition-transform">
-            <span aria-hidden="true">▶</span> Experience this chapter
-          </Link>
-        </p>
-        <p className="mt-5 text-sm">
-          <Link href={`/timeline?chapter=${chapter.slug}`} className="link-quiet text-muted hover:text-text-light">
-            See this chapter on the full timeline →
-          </Link>
-        </p>
       </div>
     </header>
   );

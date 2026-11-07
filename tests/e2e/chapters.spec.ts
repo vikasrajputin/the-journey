@@ -92,3 +92,18 @@ test("each chapter opens with a flight into its era that can be skipped, and is 
   await page.reload();
   await expect(warp).toBeHidden();
 });
+
+test("the chapter reel slides from right to left as you scroll down, and each card leads to its part", async ({ page }) => {
+  await page.goto("/journey/before-everything");
+  const wrap = page.locator(".reel-scroll");
+  await expect(wrap).toHaveAttribute("data-live", "");
+  const x = () => page.locator(".reel-track").evaluate((el) => new DOMMatrix(getComputedStyle(el).transform).m41);
+  const top = await wrap.evaluate((el) => el.getBoundingClientRect().top + scrollY);
+  await page.evaluate((y) => scrollTo(0, y), top + 900);
+  await expect.poll(x).toBeLessThan(-200);
+  await expect(page.getByRole("link", { name: /Next chapter A Planet Is Born/ })).toHaveCount(1);
+  await page.evaluate(() => scrollTo(0, 0));
+  await page.getByRole("link", { name: /Read this part/ }).first().focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/#/);
+});
