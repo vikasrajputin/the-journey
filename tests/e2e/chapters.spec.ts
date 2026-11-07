@@ -26,10 +26,12 @@ for (const slug of slugs) {
 test("glossary term opens a definition without moving the page, and Escape closes it", async ({ page }) => {
   await page.goto("/journey/before-everything");
   const term = page.getByRole("button", { name: /redshift: show definition/ }).first();
-  await term.scrollIntoViewIfNeeded();
-  // Let the scroll and any late layout (hero media, fonts) settle before measuring.
-  await expect.poll(async () => { const a = await page.evaluate(() => window.scrollY); await page.waitForTimeout(150); return a === (await page.evaluate(() => window.scrollY)); }).toBe(true);
-  // And let the section's reveal transition finish, so the click lands on a still target.
+  // Inside the sideways reel, focusing the term brings its column into view.
+  await term.focus();
+  await expect(term).toBeInViewport();
+  // Wait until both the page and the sliding reel have come to rest.
+  const spot = () => page.evaluate(() => `${scrollY},${Math.round(document.querySelector(".glossary-term")!.getBoundingClientRect().left)}`);
+  await expect.poll(async () => { const a = await spot(); await page.waitForTimeout(300); return a === (await spot()); }).toBe(true);
   await term.evaluate((el) => Promise.all((el.closest("[data-reveal]") ?? el).getAnimations({ subtree: true }).map((a) => a.finished)));
   const before = await page.evaluate(() => window.scrollY);
   await term.click();
@@ -44,7 +46,10 @@ test("glossary term opens a definition without moving the page, and Escape close
 
 test("source marker opens the sources for a passage with external links", async ({ page }) => {
   await page.goto("/journey/age-of-giants");
-  await page.getByRole("button", { name: /Sources for this passage/ }).first().click();
+  const marker = page.getByRole("button", { name: /Sources for this passage/ }).first();
+  await marker.focus();
+  await expect(marker).toBeInViewport();
+  await marker.click();
   const panel = page.locator("[popover]:popover-open");
   await expect(panel).toBeVisible();
   const link = panel.getByRole("link").first();
@@ -54,7 +59,9 @@ test("source marker opens the sources for a passage with external links", async 
 
 test("chapters link forward and back", async ({ page }) => {
   await page.goto("/journey/first-life");
-  await page.getByRole("link", { name: /Next · Chapter 4/ }).click();
+  const nextLink = page.getByRole("link", { name: /Next · Chapter 4/ });
+  await nextLink.focus();
+  await page.keyboard.press("Enter");
   await expect(page).toHaveURL(/\/journey\/diversification$/);
   await page.goBack();
   await expect(page).toHaveURL(/\/journey\/first-life$/);
@@ -101,9 +108,9 @@ test("the chapter reel slides from right to left as you scroll down, and each ca
   const top = await wrap.evaluate((el) => el.getBoundingClientRect().top + scrollY);
   await page.evaluate((y) => scrollTo(0, y), top + 900);
   await expect.poll(x).toBeLessThan(-200);
-  await expect(page.getByRole("link", { name: /Next chapter A Planet Is Born/ })).toHaveCount(1);
+  await expect(page.getByRole("link", { name: /Next · Chapter 2/ })).toHaveCount(1);
   await page.evaluate(() => scrollTo(0, 0));
-  await page.getByRole("link", { name: /Read this part/ }).first().focus();
+  await page.getByRole("link", { name: /Skip to the evidence/ }).first().focus();
   await page.keyboard.press("Enter");
-  await expect(page).toHaveURL(/#/);
+  await expect(page).toHaveURL(/#evidence/);
 });

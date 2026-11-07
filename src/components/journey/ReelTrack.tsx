@@ -34,6 +34,14 @@ export function ReelTrack({ children }: { children: React.ReactNode }) {
       topOffset = parseFloat(getComputedStyle(st).top) || 0;
       distance = Math.max(0, tr.scrollWidth - st.clientWidth);
       reel.style.setProperty("--reel-h", `${Math.round(distance + stageH)}px`);
+      // Panels whose content is taller than they are scroll on their own; the rest pass the wheel to the page.
+      tr.querySelectorAll<HTMLElement>(".reel-panel").forEach((el) => {
+        const scrolls = el.scrollHeight > el.clientHeight + 4;
+        el.toggleAttribute("data-lenis-prevent", scrolls);
+        // A panel that scrolls on its own must be reachable by keyboard too.
+        if (scrolls && !el.hasAttribute("tabindex")) el.tabIndex = 0;
+        else if (!scrolls && el.getAttribute("tabindex") === "0") el.removeAttribute("tabindex");
+      });
     };
     measure();
     const ro = new ResizeObserver(measure);
@@ -74,15 +82,41 @@ export function ReelTrack({ children }: { children: React.ReactNode }) {
     });
     io.observe(reel);
 
+    // The page position that shows a given panel (or anything inside it).
+    const topFor = (el: Element) => {
+      const panel = (el.closest?.(".reel-panel") ?? el.querySelector?.(".reel-panel") ?? el) as HTMLElement;
+      const left = panel.getBoundingClientRect().left - tr.getBoundingClientRect().left;
+      const w = panel.offsetWidth;
+      const want = clamp(w > st.clientWidth * 0.9 ? left - 24 : left - (st.clientWidth - w) / 2, 0, distance);
+      return reel.getBoundingClientRect().top + scrollY - topOffset + (distance ? (want / distance) * (reel.offsetHeight - stageH) : 0);
+    };
+    const go = (el: Element) => window.scrollTo({ top: topFor(el), behavior: "instant" as ScrollBehavior });
+
     // Tabbing to a link inside the reel scrolls the page to where its card is in view.
     const onFocus = (e: FocusEvent) => {
-      const panel = (e.target as HTMLElement).closest?.(".reel-panel") as HTMLElement | null;
-      if (!panel || !distance) return;
-      st.scrollLeft = 0;
-      const want = clamp(panel.offsetLeft - (st.clientWidth - panel.offsetWidth) / 2, 0, distance);
-      const top = reel.getBoundingClientRect().top + scrollY - topOffset + (want / distance) * (reel.offsetHeight - stageH);
-      window.scrollTo({ top, behavior: "instant" as ScrollBehavior });
+      if (!distance) return;
+      go(e.target as Element);
     };
+    // In-page links (Read this part, Skip to the evidence, source lists) travel along the reel.
+    const onClick = (e: MouseEvent) => {
+      if (e.defaultPrevented || e.button !== 0) return;
+      const a = (e.target as Element | null)?.closest?.('a[href*="#"]') as HTMLAnchorElement | null;
+      if (!a) return;
+      const url = new URL(a.href, location.href);
+      if (url.pathname !== location.pathname || !url.hash) return;
+      const target = document.getElementById(decodeURIComponent(url.hash.slice(1)));
+      if (!target || !tr.contains(target)) return;
+      e.preventDefault();
+      history.pushState(null, "", url.hash);
+      go(target);
+      (document.getElementById(target.id + "-title") ?? target).focus?.({ preventScroll: true });
+    };
+    document.addEventListener("click", onClick, true);
+    // Opened at an anchor inside the reel: go straight there.
+    if (location.hash) {
+      const t = document.getElementById(decodeURIComponent(location.hash.slice(1)));
+      if (t && tr.contains(t)) requestAnimationFrame(() => go(t));
+    }
     tr.addEventListener("focusin", onFocus);
 
     return () => {
@@ -90,6 +124,7 @@ export function ReelTrack({ children }: { children: React.ReactNode }) {
       ro.disconnect();
       io.disconnect();
       tr.removeEventListener("focusin", onFocus);
+      document.removeEventListener("click", onClick, true);
       reel.removeAttribute("data-live");
       reel.style.removeProperty("--reel-h");
       tr.style.transform = "";
