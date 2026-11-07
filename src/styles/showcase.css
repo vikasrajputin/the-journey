@@ -530,8 +530,6 @@ html[data-motion] .warp {
 /* ---------- Chapter opening reel: slides right to left as you scroll ---------- */
 .reel {
   position: relative;
-  border-bottom: 1px solid var(--color-border-dark);
-  padding-bottom: clamp(2.5rem, 2rem + 3vw, 5rem);
 }
 .reel-stage {
   position: relative;
@@ -847,14 +845,41 @@ html[data-motion] .warp {
 .reel-next-link:hover .reel-next-arrow {
   transform: translateX(0.75rem);
 }
-.reel-facts {
-  padding-top: clamp(2.5rem, 2rem + 2vw, 4rem);
+.reel-about {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.1rem;
+  width: min(40rem, 86vw);
+  padding: clamp(1.25rem, 1rem + 1.5vw, 2.5rem);
+  border-radius: 1.75rem;
+  border: 1px solid var(--color-border-dark);
+  background: color-mix(in srgb, var(--chapter-accent) 8%, var(--color-night));
+  overflow-y: auto;
 }
-.reel-opening {
-  max-width: 48rem;
-  font-family: var(--font-display);
-  font-size: clamp(1.5rem, 1.1rem + 1.8vw, 2.5rem);
-  font-style: italic;
-  line-height: 1.2;
+.reel-about-intro {
+  font-size: clamp(1rem, 0.9rem + 0.5vw, 1.3rem);
+  line-height: 1.5;
+  color: var(--color-text-light);
+}
+.reel-about-facts {
+  display: grid;
+  gap: 0.75rem;
+}
+.reel-about-facts > div {
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border-dark);
+}
+.reel-about-facts dt {
+  color: var(--chapter-accent);
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.reel-about-facts dd {
+  margin-top: 0.2rem;
+  font-size: 0.92rem;
+  line-height: 1.4;
   color: var(--color-text-light);
 }

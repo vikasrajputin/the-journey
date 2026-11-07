@@ -53,18 +53,6 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
       <div className="container-wide relative lg:grid lg:grid-cols-[minmax(0,1fr)_14rem] lg:gap-16 xl:grid-cols-[14rem_minmax(0,1fr)_14rem]">
         <div className="hidden xl:block" aria-hidden="true" />
         <div className="min-w-0">
-          <div className="mx-auto max-w-[var(--width-reading)] pt-14 md:pt-20">
-            <p className="text-[length:var(--text-lead)] leading-relaxed text-text-light/90" data-reveal>
-              {chapter.intro}
-            </p>
-            {chapter.evidence.length ? (
-              <p className="mt-6 text-sm">
-                <a href="#evidence" className="link-quiet text-chapter">
-                  Skip to the evidence for this chapter
-                </a>
-              </p>
-            ) : null}
-          </div>
 
           {chapter.sections.map((section, si) => (
             <Fragment key={section.id}>
