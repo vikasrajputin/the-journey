@@ -43,6 +43,7 @@ const items: MediaItem[] = [
   { id: "earthrise", kind: "image", file: "NASA-Apollo8-Dec24-Earthrise.jpg", alt: "Earthrise: Earth rising over the Moon, photographed from Apollo 8 in 1968", credit: "NASA / Bill Anders" },
   { id: "iss-earth", kind: "video", file: "View of the Earth from the ISS (8K).webm", alt: "Earth turning beneath the International Space Station", credit: "NASA" },
   { id: "city-lights", kind: "video", file: "Ocean Moon Glint and City Night Lights in 4K.webm", alt: "City lights and moonlight on the ocean, filmed from the International Space Station", credit: "NASA" },
+  { id: "chandrayaan", kind: "image", file: "Chandrayaan-3 – Image of Vikram lander on lunar surface taken by Pragyan rover navcam at 1104 IST, 30 August 2023 from 15 meters away (without text).webp", alt: "India's Vikram lander on the Moon near its south pole, photographed by the Pragyan rover on 30 August 2023", credit: "ISRO" },
   { id: "black-marble", kind: "image", file: "BlackMarble20161km.jpg", alt: "Earth at night: city lights across every continent", credit: "NASA Earth Observatory" },
   { id: "pale-blue-dot", kind: "image", file: "Pale Blue Dot from Voyager 1 - PIA23645.png", alt: "The Pale Blue Dot: Earth as a single pixel in a sunbeam, photographed by Voyager 1 from about 6 billion km away", credit: "NASA / JPL-Caltech" },
 ];

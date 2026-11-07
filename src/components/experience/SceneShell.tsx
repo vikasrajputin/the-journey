@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
+import { getSource } from "@/data/sources";
 import { useExperience } from "./ExperienceContext";
 import type { SceneDef } from "./scene-data";
 
@@ -73,6 +74,10 @@ export function SceneShell({
   }, [def]);
 
   const credits = def.media.map((id) => media[id]).filter(Boolean);
+  const dialog = useRef<HTMLDialogElement>(null);
+  const current = def.beats[beat] ?? def.beats[0];
+  const orgs = [...new Set(current.sources.map((id) => shortOrg(getSource(id)?.organisation)))].filter(Boolean).slice(0, 2);
+  const openProof = () => dialog.current?.showModal();
 
   return (
     <section
@@ -95,6 +100,10 @@ export function SceneShell({
           <h2 id={`${def.id}-title`} className="scene-title" tabIndex={-1}>
             {def.title}
           </h2>
+          <p className="scene-see" data-real={current.real || undefined}>
+            <span className="scene-see-dot" aria-hidden="true" />
+            {current.see}
+          </p>
         </header>
 
         <div className="scene-captions">
@@ -106,6 +115,10 @@ export function SceneShell({
         </div>
 
         <div className="scene-foot">
+          <button type="button" className="scene-proof" onClick={openProof}>
+            See the proof
+            {orgs.length ? <span className="scene-proof-orgs">· {orgs.join(" · ")}</span> : null}
+          </button>
           <Link href={`/journey/${def.chapter}/`} className="scene-deeper">
             Go deeper <span aria-hidden="true">→</span>
             <span className="sr-only">: read chapter {def.number}, {def.title}</span>
@@ -128,6 +141,70 @@ export function SceneShell({
           ) : null}
         </div>
       </div>
+
+      <dialog ref={dialog} className="proof" aria-labelledby={`${def.id}-proof-title`} onClick={(e) => e.target === e.currentTarget && dialog.current?.close()}>
+        <div className="proof-inner">
+          <div className="proof-head">
+            <div>
+              <p className="scene-eyebrow">Chapter {def.number} · The proof</p>
+              <h3 id={`${def.id}-proof-title`} className="proof-title">
+                {def.title}
+              </h3>
+            </div>
+            <button type="button" className="proof-close" onClick={() => dialog.current?.close()}>
+              Close
+            </button>
+          </div>
+          <p className="proof-intro">
+            Every line in this scene is backed by a science body, museum or peer-reviewed study. Labels show what is real and what is a simulation.
+          </p>
+          <ol className="proof-list">
+            {def.beats.map((b, i) => (
+              <li key={i} data-current={i === beat || undefined}>
+                <p className="proof-claim">{b.text}</p>
+                <p className="proof-see" data-real={b.real || undefined}>
+                  <span className="scene-see-dot" aria-hidden="true" />
+                  {b.see}
+                </p>
+                <ul className="proof-sources">
+                  {b.sources.map((id) => {
+                    const src = getSource(id);
+                    if (!src) return null;
+                    return (
+                      <li key={id}>
+                        <a href={src.url} target="_blank" rel="noopener noreferrer">
+                          {src.title}
+                          <span className="sr-only"> (opens in a new tab)</span>
+                        </a>
+                        <span className="proof-org">
+                          {" "}
+                          · {src.organisation}
+                          {src.verification === "located" ? " · publisher blocks automated checks; awaiting a hand check" : ""}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </li>
+            ))}
+          </ol>
+          <div className="proof-foot">
+            <Link href={`/journey/${def.chapter}/#evidence`} className="scene-action-inline">
+              Read Chapter {def.number} with all its evidence
+            </Link>
+            <Link href="/evidence/" className="scene-action-inline ghost">
+              How do scientists know?
+            </Link>
+          </div>
+        </div>
+      </dialog>
     </section>
   );
+}
+
+/** "NASA Science, Hubble Space Telescope" → "NASA Science" */
+function shortOrg(org?: string) {
+  if (!org) return "";
+  const first = org.split(/,|\|/)[0].trim();
+  return first.replace(/^Smithsonian National Museum of Natural History.*/, "Smithsonian").replace(/^Indian Space Research Organisation \(ISRO\)/, "ISRO");
 }

@@ -71,3 +71,18 @@ describe("evidence methods", () => {
     }
   });
 });
+
+import { scenes } from "@/components/experience/scene-data";
+import { getSource } from "@/data/sources";
+
+describe("immersive journey", () => {
+  it("backs every caption with at least one registered source and labels what is shown", () => {
+    for (const scene of scenes) {
+      for (const beat of scene.beats) {
+        expect(beat.sources.length, beat.text).toBeGreaterThan(0);
+        for (const id of beat.sources) expect(getSource(id), `${scene.id}: ${id}`).toBeDefined();
+        expect(beat.see).toMatch(/^(Real|Simulation|Reconstructed)/);
+      }
+    }
+  });
+});

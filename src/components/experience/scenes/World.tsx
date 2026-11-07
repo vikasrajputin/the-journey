@@ -11,6 +11,7 @@ export function WorldScene({ s }: { s: SceneState }) {
   const rise = useRef<HTMLDivElement>(null);
   const night = useRef<HTMLDivElement>(null);
   const marble = useRef<HTMLDivElement>(null);
+  const moon = useRef<HTMLDivElement>(null);
   const [nightOn, setNightOn] = useState(false);
   const [fast, setFast] = useState(false);
 
@@ -19,10 +20,11 @@ export function WorldScene({ s }: { s: SceneState }) {
       rise.current.style.opacity = String(1 - band(p, 0.26, 0.32));
       rise.current.style.transform = `translateY(${(0.3 - p) * 8}%) scale(1.1)`;
     }
-    const n = String(band(p, 0.26, 0.32));
+    const n = String(band(p, 0.26, 0.32) * (1 - band(p, 0.62, 0.68)));
     if (night.current) night.current.style.opacity = n;
     if (marble.current) marble.current.style.opacity = n;
-    const on = p > 0.2;
+    if (moon.current) moon.current.style.opacity = String(band(p, 0.62, 0.68));
+    const on = p > 0.2 && p < 0.7;
     if (on !== nightOn) setNightOn(on);
   });
 
@@ -36,10 +38,11 @@ export function WorldScene({ s }: { s: SceneState }) {
       <MediaImage ref={rise} id="earthrise" className="scene-layer" />
       <MediaImage ref={marble} id="black-marble" className="scene-layer" style={{ opacity: 0 }} kenburns />
       <MediaVideo ref={night} id="city-lights" className="scene-layer" style={{ opacity: 0 }} play={nightOn && s.active} rate={fast ? 4 : 1} />
+      <MediaImage ref={moon} id="chandrayaan" className="scene-layer" style={{ opacity: 0 }} kenburns />
       <div
         className="scene-canvas"
         aria-hidden="true"
-        onPointerDown={() => (s.progress.current ?? 0) > 0.28 && hold(true)}
+        onPointerDown={() => { const p = s.progress.current ?? 0; if (p > 0.28 && p < 0.64) hold(true); }}
         onPointerUp={() => hold(false)}
         onPointerLeave={() => hold(false)}
         onPointerCancel={() => hold(false)}

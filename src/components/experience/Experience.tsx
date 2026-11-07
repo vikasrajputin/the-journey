@@ -290,7 +290,7 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
             </ul>
             <h3 className="mt-14 font-display text-[length:var(--text-h3)]">Photographs, video and sound</h3>
             <p className="mt-3 max-w-2xl text-sm text-muted">
-              Photographs and video are real, from NASA, ESA, NOAA and photographers on Wikimedia Commons, and load directly from Wikimedia. Animations are artistic impressions. Every sound is synthesised live in your browser. The dinosaur calls are reconstructions: nobody knows exactly what dinosaurs sounded like. The narration uses your device&rsquo;s own voice.
+              Photographs and video are real, from NASA, ESA, ISRO, NOAA and photographers on Wikimedia Commons, and load directly from Wikimedia. Animations are artistic impressions. Every sound is synthesised live in your browser. The dinosaur calls are reconstructions: nobody knows exactly what dinosaurs sounded like. The narration uses your device&rsquo;s own voice.
             </p>
             <ul className="outro-credits">
               {Object.values(media).map((m) => (

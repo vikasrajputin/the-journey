@@ -746,3 +746,171 @@ html[data-motion="reduce"] .kenburns {
     font-size: 0.78rem;
   }
 }
+
+/* ---------- What you're seeing, and the proof ---------- */
+.scene-see {
+  margin-top: 0.7rem;
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  max-width: 30rem;
+  padding: 0.4rem 0.75rem;
+  border-radius: 0.75rem;
+  background: rgb(0 0 0 / 0.5);
+  backdrop-filter: blur(8px);
+  border: 1px dashed rgb(190 170 255 / 0.55);
+  font-size: 0.72rem;
+  line-height: 1.35;
+  color: rgb(235 230 255 / 0.95);
+}
+.scene-see[data-real] {
+  border: 1px solid rgb(140 220 170 / 0.6);
+  color: rgb(220 255 232);
+}
+.scene-see-dot {
+  flex: none;
+  margin-top: 0.3em;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-radius: 50%;
+  border: 1.5px dashed #bfaaff;
+}
+[data-real] > .scene-see-dot {
+  border: none;
+  background: #7ee2a8;
+  box-shadow: 0 0 8px #7ee2a8;
+}
+.scene-counter {
+  top: calc(13.5rem + env(safe-area-inset-top));
+}
+.scene-action.scene-action-center {
+  bottom: auto;
+}
+.hud-motion {
+  display: inline-flex;
+  gap: 0.4rem;
+}
+.scene-proof {
+  display: inline-flex;
+  align-items: center;
+  min-height: 2.75rem;
+  padding: 0 1.1rem;
+  border-radius: 999px;
+  background: var(--color-accent);
+  color: #120c04;
+  font-weight: 600;
+  box-shadow: 0 0 24px rgb(214 169 108 / 0.35);
+}
+.scene-proof-orgs {
+  font-weight: 500;
+  opacity: 0.8;
+}
+@media (max-width: 640px) {
+  .scene-proof-orgs {
+    display: none;
+  }
+  .scene-credits {
+    display: none;
+  }
+}
+
+.proof {
+  width: min(46rem, calc(100vw - 1.5rem));
+  max-height: min(88svh, 52rem);
+  margin: auto;
+  padding: 0;
+  border-radius: 1rem;
+  border: 1px solid rgb(255 255 255 / 0.16);
+  background: #0a0c14;
+  color: var(--color-text-light);
+  box-shadow: 0 40px 120px rgb(0 0 0 / 0.8);
+}
+.proof::backdrop {
+  background: rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(4px);
+}
+.proof-inner {
+  padding: 1.25rem 1.25rem 1.5rem;
+}
+.proof-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+}
+.proof-title {
+  margin-top: 0.3rem;
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: 1.8rem;
+  line-height: 1.1;
+}
+.proof-close {
+  min-height: 2.75rem;
+  padding: 0 1rem;
+  border-radius: 999px;
+  border: 1px solid rgb(255 255 255 / 0.3);
+}
+.proof-intro {
+  margin-top: 0.75rem;
+  font-size: 0.9rem;
+  color: var(--color-muted);
+}
+.proof-list {
+  margin-top: 1.25rem;
+  display: grid;
+  gap: 1rem;
+}
+.proof-list > li {
+  padding: 0.9rem 1rem;
+  border-radius: 0.75rem;
+  background: rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(255 255 255 / 0.08);
+}
+.proof-list > li[data-current] {
+  border-color: var(--chapter-accent);
+  background: rgb(255 255 255 / 0.07);
+}
+.proof-claim {
+  font-family: var(--font-newsreader), Georgia, serif;
+  font-size: 1.08rem;
+  line-height: 1.4;
+}
+.proof-see {
+  margin-top: 0.5rem;
+  display: flex;
+  gap: 0.5rem;
+  font-size: 0.78rem;
+  color: #d9ccff;
+}
+.proof-see[data-real] {
+  color: #b9f2cf;
+}
+.proof-sources {
+  margin-top: 0.5rem;
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+}
+.proof-sources a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.proof-org {
+  color: var(--color-muted);
+}
+.proof-foot {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.scene-caption {
+  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+}
+.scene-caption[data-on] {
+  transition: opacity 0.7s var(--ease-out) 0.25s, transform 0.7s var(--ease-out) 0.25s;
+}
+.scene-proof {
+  gap: 0.35rem;
+}
