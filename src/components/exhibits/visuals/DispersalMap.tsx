@@ -7,12 +7,12 @@ type Pt = readonly [number, number];
 const africa: Pt = [25, 2];
 const routes: { label: string; from: Pt; to: Pt; when: string; dashed?: boolean }[] = [
   { label: "Early groups reach Southwest Asia", from: [33, 14], to: [37, 32], when: "more than 100,000 years ago", dashed: true },
-  { label: "Major dispersal from Africa", from: [40, 12], to: [52, 26], when: "roughly 70,000–50,000 years ago" },
+  { label: "Major dispersal from Africa", from: [40, 12], to: [52, 26], when: "within roughly the last 60,000 years" },
   { label: "Across southern Asia", from: [52, 26], to: [102, 14], when: "after the major dispersal" },
-  { label: "Australia", from: [102, 14], to: [134, -24], when: "by at least about 50,000 years ago" },
+  { label: "Australia", from: [102, 14], to: [134, -24], when: "by around 42,000 years ago, possibly 65,000" },
   { label: "Europe, where people met Neanderthals", from: [52, 30], to: [14, 48], when: "after the major dispersal" },
   { label: "Northeast Asia", from: [80, 38], to: [130, 60], when: "after the major dispersal" },
-  { label: "The Americas", from: [135, 62], to: [-100, 42], when: "by at least about 15,000 years ago, possibly earlier" },
+  { label: "The Americas", from: [135, 62], to: [-100, 42], when: "by about 15,000 years ago, possibly 23,000 or earlier" },
 ];
 
 function arc(a: Pt, b: Pt) {

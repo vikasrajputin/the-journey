@@ -65,7 +65,7 @@ export const chapter: Chapter = {
         },
         {
           type: "paragraph",
-          text: "In the Indus Valley of present-day Pakistan and northwest India, cities such as Mohenjo-daro and Harappa flourished from around 2600 BCE, with planned street grids, standardised bricks and sophisticated drainage. In China, the late Shang capital at Yinxu was a major centre by around 1300 BCE. In Mesoamerica, Monte Albán and later Teotihuacan became large urban centres.",
+          text: "In the Indus Valley of present-day Pakistan and northwest India, cities such as Mohenjo-daro and Harappa flourished from around 2500 BCE, with planned street grids, standardised bricks and sophisticated drainage. In China, the late Shang capital at Yinxu was a major centre by around 1300 BCE. In Mesoamerica, Monte Albán and later Teotihuacan became large urban centres.",
           sourceIds: ["unesco-moenjodaro", "unesco-yinxu", "met-monte-alban"],
         },
         {
@@ -78,11 +78,11 @@ export const chapter: Chapter = {
     {
       id: "writing",
       title: "Writing things down",
-      kicker: "From around 3200 BCE in Mesopotamia",
+      kicker: "From around 3100 BCE in Mesopotamia",
       blocks: [
         {
           type: "paragraph",
-          text: "The earliest known writing comes from Mesopotamia, around 3200 BCE. These first tablets were largely administrative: records of grain, livestock, labour and rations, pressed into clay. Over centuries, the system developed into [[cuneiform]], used for laws, letters, literature, science and religion.",
+          text: "The earliest known writing comes from Mesopotamia, around 3100 BCE, and may have begun somewhat earlier. These first tablets were largely administrative: records of grain, livestock, labour and rations, pressed into clay. Over centuries, the system developed into [[cuneiform]], used for laws, letters, literature, science and religion.",
           sourceIds: ["met-origins-writing"],
         },
         {

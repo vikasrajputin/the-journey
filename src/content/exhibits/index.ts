@@ -14,7 +14,7 @@ export const exhibits: readonly ExhibitDefinition[] = [
     caption: "Milestones of the early universe as described by the standard cosmological model. The spacing is not to scale, and all times are approximate.",
     textAlternative:
       "A sequence of milestones after the Big Bang. In the first fraction of a second, the universe is extremely hot and dense and expanding. Within about the first three minutes, protons and neutrons combine into the nuclei of hydrogen, helium and a trace of lithium. For the next several hundred thousand years, the universe is a hot, glowing fog of charged particles and light. At about 380,000 years, it cools enough for electrons to join nuclei and form neutral atoms; light travels freely for the first time, and this light is the cosmic microwave background we detect today. A long 'dark age' follows with no stars. Within a few hundred million years, gravity pulls gas into the first stars and galaxies.",
-    sourceIds: ["esa-planck-cmb", "wmap-bbn", "nasa-universe-overview"],
+    sourceIds: ["esa-planck-cmb", "nasa-universe-overview"],
   },
   {
     id: "expanding-grid",
@@ -92,7 +92,7 @@ export const exhibits: readonly ExhibitDefinition[] = [
     kind: "data",
     caption: "Period boundaries from the International Chronostratigraphic Chart (2024/12), rounded to the nearest million years. Bar widths are proportional to duration.",
     textAlternative:
-      "Cambrian, about 539 to 485 million years ago. Ordovician, 485 to 444. Silurian, 444 to 419. Devonian, 419 to 359. Carboniferous, 359 to 299. Permian, 299 to 252. Triassic, 252 to 201. Jurassic, 201 to 145. Cretaceous, 145 to 66. Paleogene, 66 to 23. Neogene, 23 to 2.6. Quaternary, 2.6 million years ago to the present. The Paleozoic Era spans Cambrian to Permian, the Mesozoic spans Triassic to Cretaceous, and the Cenozoic spans Paleogene to the present.",
+      "Cambrian, about 539 to 487 million years ago. Ordovician, 487 to 443. Silurian, 443 to 420. Devonian, 420 to 359. Carboniferous, 359 to 299. Permian, 299 to 252. Triassic, 252 to 201. Jurassic, 201 to 143. Cretaceous, 143 to 66. Paleogene, 66 to 23. Neogene, 23 to 2.6. Quaternary, 2.6 million years ago to the present. The Paleozoic Era spans Cambrian to Permian, the Mesozoic spans Triassic to Cretaceous, and the Cenozoic spans Paleogene to the present.",
     sourceIds: ["ics-chart"],
   },
 
@@ -133,9 +133,9 @@ export const exhibits: readonly ExhibitDefinition[] = [
     kind: "diagram",
     caption: "A schematic map of Homo sapiens dispersals. Routes and dates are simplified and some are debated.",
     textAlternative:
-      "Homo sapiens originated in Africa, with early fossils from Morocco, Ethiopia and South Africa, suggesting a pan-African origin. Some early groups reached Southwest Asia more than 100,000 years ago. A major, widely successful dispersal from Africa took place roughly 70,000 to 50,000 years ago, after which people spread across Asia, reached Australia by at least about 50,000 years ago (some estimates are earlier), entered Europe and met Neanderthals there, and later reached the Americas, by at least about 15,000 years ago and possibly earlier. Along the way, populations interbred with Neanderthals and Denisovans.",
+      "Homo sapiens originated in Africa, with early fossils from Morocco, Ethiopia and South Africa, suggesting a pan-African origin. Some early groups reached Southwest Asia more than 100,000 years ago. A major, widely successful dispersal from Africa took place within roughly the last 60,000 years, after which people spread across Asia, reached Australia by around 42,000 years ago (possibly as early as 65,000), entered Europe and met Neanderthals there, and later reached the Americas, by about 15,000 years ago and possibly 23,000 years ago or earlier. Along the way, populations interbred with Neanderthals and Denisovans.",
     credit: "Map outlines from Natural Earth (public domain)",
-    sourceIds: ["nhm-homo-sapiens", "hublin-2017-irhoud", "green-2010-neandertal"],
+    sourceIds: ["nhm-homo-sapiens", "nhm-spread-out-of-africa", "hublin-2017-irhoud", "green-2010-neandertal"],
   },
 
   /* 7. Civilisation */
@@ -155,7 +155,7 @@ export const exhibits: readonly ExhibitDefinition[] = [
     kind: "diagram",
     caption: "Approximate earliest dates for some writing systems widely regarded as independent inventions. Scholars debate exact dates and, in some cases, independence.",
     textAlternative:
-      "Mesopotamia, proto-cuneiform: around 3200 BCE, first used for administrative records. Egypt, hieroglyphs: around the same time, late 4th millennium BCE. China, oracle-bone inscriptions of the late Shang dynasty: around 1200 BCE. Mesoamerica: several scripts, with early examples from the first millennium BCE and the Maya script developing later. The Indus script, used from about 2600 BCE, has not been deciphered, and whether it represents full writing is debated.",
+      "Mesopotamia, proto-cuneiform: around 3100 BCE, first used for administrative records. Egypt, hieroglyphs: around the same time, late 4th millennium BCE. China, oracle-bone inscriptions of the late Shang dynasty: around 1200 BCE. Mesoamerica: several scripts, with early examples from the first millennium BCE and the Maya script developing later. The Indus script, used in Indus cities from around 2500 BCE, has not been deciphered, and whether it represents full writing is debated.",
     sourceIds: ["met-origins-writing", "unesco-yinxu", "met-monte-alban", "bm-hieroglyphs"],
   },
 
@@ -186,7 +186,7 @@ export const exhibits: readonly ExhibitDefinition[] = [
     kind: "diagram",
     caption: "A few milestones in recording and sharing information. Dates are approximate.",
     textAlternative:
-      "Around 3200 BCE: early writing on clay tablets in Mesopotamia. 868 CE: the earliest complete dated printed book, the Diamond Sutra, printed from woodblocks in China. 1450s: Gutenberg's movable-type press in Mainz. 1830s to 1840s: electric telegraphs carry messages almost instantly over long distances. 1940s: early electronic computers. 1969: the first ARPANET link. 1989: Tim Berners-Lee proposes the World Wide Web at CERN. 2010s to 2020s: machine-learning systems trained on vast datasets become widely used.",
+      "Around 3100 BCE: early writing on clay tablets in Mesopotamia. 868 CE: the earliest complete dated printed book, the Diamond Sutra, printed from woodblocks in China. 1450s: Gutenberg's movable-type press in Mainz. 1830s to 1840s: electric telegraphs carry messages almost instantly over long distances. 1940s: early electronic computers. 1969: the first ARPANET link. 1989: Tim Berners-Lee proposes the World Wide Web at CERN. 2010s to 2020s: machine-learning systems trained on vast datasets become widely used.",
     sourceIds: ["met-origins-writing", "bl-diamond-sutra", "loc-gutenberg", "chm-timeline", "cern-web"],
     // Telegraph and ARPANET dates: flagged for a dedicated source in Phase 5.
   },

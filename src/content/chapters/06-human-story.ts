@@ -114,9 +114,8 @@ export const chapter: Chapter = {
       blocks: [
         {
           type: "paragraph",
-          text: "Groups of *Homo sapiens* moved out of Africa more than once. Some early dispersals left few lasting descendants. A later expansion, roughly 70,000 to 50,000 years ago, gave rise to most of the ancestry of people living outside Africa today. Humans reached Australia by at least about 50,000 years ago and the Americas by at least about 15,000 years ago; both dates are active research areas.",
-          sourceIds: ["nhm-homo-sapiens"],
-          review: "Arrival dates for Australia and the Americas: add dedicated sources and give ranges.",
+          text: "Groups of *Homo sapiens* moved out of Africa more than once. Some early dispersals left few lasting descendants. A later expansion, within roughly the last 60,000 years, gave rise to most of the ancestry of people living outside Africa today. People reached Australia by around 42,000 years ago, and possibly as early as 65,000. They reached the Americas by about 15,000 years ago, and footprints in North America suggest people were there 23,000 to 21,000 years ago. Both dates are active research areas.",
+          sourceIds: ["nhm-spread-out-of-africa", "nhm-homo-sapiens"],
         },
         { type: "exhibit", exhibitId: "dispersal-map" },
         {

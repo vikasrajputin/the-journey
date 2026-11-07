@@ -35,8 +35,7 @@ export const chapter: Chapter = {
             { value: "≈380,000 years", label: "When the universe became transparent and released the light we now see as the cosmic microwave background" },
             { value: "≈93 billion light-years", label: "Approximate diameter of the observable universe today", note: "Larger than 2 × 13.8 billion because space has expanded while light travelled" },
           ],
-          sourceIds: ["planck-2018-params", "esa-planck-cmb"],
-          review: "Confirm the 93-billion-light-year figure against a NASA or ESA page before launch.",
+          sourceIds: ["planck-2018-params", "esa-planck-cmb", "britannica-observable-universe"],
         },
       ],
     },
@@ -71,7 +70,7 @@ export const chapter: Chapter = {
         {
           type: "paragraph",
           text: "As the early universe expanded, it cooled. Within roughly the first few minutes, protons and neutrons fused into the nuclei of the lightest elements: hydrogen, helium and a trace of lithium. The amounts predicted by this early [[nucleosynthesis]] closely match what astronomers measure in the oldest, least-processed gas in the universe.",
-          sourceIds: ["wmap-bbn"],
+          sourceIds: ["nasa-universe-overview"],
         },
         {
           type: "paragraph",
@@ -98,7 +97,7 @@ export const chapter: Chapter = {
         {
           type: "paragraph",
           text: "Over a few hundred million years, clouds of hydrogen and helium collapsed until their cores became hot and dense enough for nuclear fusion. The first stars switched on. Stars gathered into the first [[galaxy|galaxies]], which merged and grew. Telescopes such as the James Webb Space Telescope are now observing galaxies from this early era, and some of what they find is challenging the details of existing models.",
-          review: "Add a specific JWST source for early-galaxy observations before launch.",
+          sourceIds: ["nasa-universe-overview", "cfa-jwst-early-galaxies"],
         },
       ],
     },
@@ -170,7 +169,7 @@ export const chapter: Chapter = {
       howStudied: "Spectroscopy of very old stars and distant, chemically pristine gas clouds.",
       limitations: "The predicted amount of lithium is higher than observed: the 'lithium problem' is unresolved.",
       status: "strong-evidence",
-      sourceIds: ["wmap-bbn"],
+      sourceIds: ["nasa-universe-overview"],
     },
   ],
   goDeeper: [
@@ -181,7 +180,7 @@ export const chapter: Chapter = {
         {
           type: "paragraph",
           text: "Redshifts, the microwave background and light-element abundances are measured in completely different ways, by different instruments, often by different teams. Each could be explained away on its own. Together, they fit one consistent picture. That convergence is a large part of why the standard cosmological model is widely accepted, while scientists continue to test where it might need revising.",
-          sourceIds: ["planck-2018-params", "wmap-bbn", "nasa-hubble-redshift"],
+          sourceIds: ["planck-2018-params", "nasa-universe-overview", "nasa-hubble-redshift"],
         },
       ],
     },

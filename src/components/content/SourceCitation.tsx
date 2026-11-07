@@ -24,8 +24,11 @@ export function SourceLine({ source }: { source: Source }) {
       </span>
       <span className="mt-1 block text-sm text-text-light/80">Supports: {source.supports}</span>
       {source.note ? <span className="mt-1 block text-sm text-muted">Note: {source.note}</span> : null}
+      {source.verification === "checked" && source.accessedDate ? (
+        <span className="mt-1 block text-xs text-muted">Checked against this claim on {new Date(source.accessedDate).toLocaleDateString("en-GB", { day: "numeric", month: "long", year: "numeric", timeZone: "UTC" })}.</span>
+      ) : null}
       {source.verification === "located" ? (
-        <span className="mt-1 block text-xs text-muted">Located on the publisher&rsquo;s site; claim-by-claim check pending.</span>
+        <span className="mt-1 block text-xs text-muted">Found on the publisher&rsquo;s site; claim-by-claim check pending (the site could not be read automatically).</span>
       ) : null}
     </>
   );

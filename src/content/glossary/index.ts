@@ -11,7 +11,7 @@ export const glossary: readonly GlossaryEntry[] = [
   { id: "cosmic-expansion", term: "expansion of space", definition: "The steady increase in distances between galaxies that are not bound together by gravity. Space itself stretches; galaxies are not flying apart through a pre-existing void.", sourceIds: ["nasa-hubble-redshift"] },
   { id: "redshift", term: "redshift", definition: "The stretching of light to longer, redder wavelengths. Light from distant galaxies is redshifted because space expanded while the light was travelling to us.", sourceIds: ["nasa-hubble-redshift"] },
   { id: "cmb", term: "cosmic microwave background", definition: "Faint microwave radiation that fills the sky in every direction. It is light released about 380,000 years after the Big Bang, when the universe first became transparent.", sourceIds: ["esa-planck-cmb"] },
-  { id: "nucleosynthesis", term: "nucleosynthesis", definition: "The making of atomic nuclei. Hydrogen, helium and a little lithium formed in the first minutes of the universe; most heavier elements were made later, in stars and stellar explosions.", sourceIds: ["nasa-star-stuff", "wmap-bbn"] },
+  { id: "nucleosynthesis", term: "nucleosynthesis", definition: "The making of atomic nuclei. Hydrogen, helium and a little lithium formed in the first minutes of the universe; most heavier elements were made later, in stars and stellar explosions.", sourceIds: ["nasa-star-stuff", "nasa-universe-overview"] },
   { id: "galaxy", term: "galaxy", definition: "A vast system of stars, gas, dust and dark matter held together by gravity. Our galaxy, the Milky Way, contains hundreds of billions of stars." },
   { id: "dark-matter", term: "dark matter", definition: "Matter that does not emit or absorb light but whose gravity shapes galaxies and the large-scale structure of the universe. What it is made of is still unknown." },
 
@@ -56,7 +56,7 @@ export const glossary: readonly GlossaryEntry[] = [
   /* Human story */
   { id: "primate", term: "primate", definition: "The group of mammals that includes lemurs, monkeys, apes and humans." },
   { id: "hominin", term: "hominin", definition: "Humans and the extinct species more closely related to us than to chimpanzees and bonobos. The group has many branches, most of which died out.", sourceIds: ["si-intro-human-evolution"] },
-  { id: "neanderthal", term: "Neanderthals", definition: "A hominin group that lived across Europe and western Asia until about 40,000 years ago. Many living people carry a small share of Neanderthal DNA.", sourceIds: ["green-2010-neandertal"] },
+  { id: "neanderthal", term: "Neanderthals", definition: "A hominin group that lived across Europe and western Asia until about 40,000 years ago. Many living people carry a small share of Neanderthal DNA.", sourceIds: ["higham-2014-neanderthal", "green-2010-neandertal"] },
   { id: "denisovan", term: "Denisovans", definition: "A hominin group known mainly from DNA and a small number of fossils from Asia. Some living populations, especially in Oceania, carry Denisovan DNA.", sourceIds: ["nobel-2022"] },
   { id: "ancient-dna", term: "ancient DNA", definition: "Genetic material recovered from old bones, teeth or sediments. It is usually damaged and fragmentary, so special methods are needed to read it reliably." },
   { id: "cumulative-culture", term: "cumulative culture", definition: "Knowledge and skills that build up across generations, with each generation learning from and improving on what came before." },

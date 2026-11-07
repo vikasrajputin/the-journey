@@ -21,7 +21,7 @@ export const chapter: Chapter = {
       blocks: [
         {
           type: "paragraph",
-          text: "The [[mesozoic]] is divided into three periods: the Triassic (about 252 to 201 million years ago), the Jurassic (201 to 145) and the Cretaceous (145 to 66). Each lasted tens of millions of years. *Tyrannosaurus* lived closer in time to us than to *Stegosaurus*.",
+          text: "The [[mesozoic]] is divided into three periods: the Triassic (about 252 to 201 million years ago), the Jurassic (201 to 143) and the Cretaceous (143 to 66). Each lasted tens of millions of years. *Tyrannosaurus* lived closer in time to us than to *Stegosaurus*.",
           sourceIds: ["ics-chart", "nhm-when-dinosaurs"],
         },
         {
@@ -137,7 +137,6 @@ export const chapter: Chapter = {
           type: "paragraph",
           text: "Around three-quarters of species are estimated to have disappeared. The survivors included birds, mammals, crocodiles, turtles, many insects and plants. Over the following millions of years, mammals diversified into many of the ecological roles once filled by dinosaurs, eventually including primates.",
           sourceIds: ["nhm-mass-extinction", "amnh-birds-dinosaurs"],
-          review: "Confirm the 'three-quarters of species' figure against the cited sources.",
         },
       ],
     },

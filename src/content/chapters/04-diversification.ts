@@ -69,7 +69,7 @@ export const chapter: Chapter = {
     {
       id: "cambrian",
       title: "The Cambrian diversification",
-      kicker: "About 539 to 485 million years ago",
+      kicker: "About 539 to 487 million years ago",
       blocks: [
         {
           type: "paragraph",
@@ -91,7 +91,7 @@ export const chapter: Chapter = {
       blocks: [
         {
           type: "paragraph",
-          text: "Moving from water to land was not one event but many, spread over more than 100 million years. Microbes and probably simple plants and fungi came first. Land plants gradually evolved waxy coatings, spores, internal plumbing and eventually roots, wood and seeds. By the Devonian Period, about 419 to 359 million years ago, the first forests had appeared.",
+          text: "Moving from water to land was not one event but many, spread over more than 100 million years. Microbes and probably simple plants and fungi came first. Land plants gradually evolved waxy coatings, spores, internal plumbing and eventually roots, wood and seeds. By the Devonian Period, about 420 to 359 million years ago, the first forests had appeared.",
           sourceIds: ["nhm-trees", "ics-chart"],
         },
         {
@@ -119,8 +119,7 @@ export const chapter: Chapter = {
         {
           type: "paragraph",
           text: "The largest, at the end of the Permian Period about 252 million years ago, wiped out the great majority of marine species. Massive volcanic eruptions in what is now Siberia are widely thought to have played a central role.",
-          sourceIds: ["nhm-mass-extinction"],
-          review: "Confirm the 'great majority' estimate and add a primary source on Siberian Traps volcanism.",
+          sourceIds: ["nhm-mass-extinction", "si-extinction-over-time"],
         },
         {
           type: "pullquote",

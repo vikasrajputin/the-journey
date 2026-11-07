@@ -47,7 +47,7 @@ export const rulers: Ruler[] = [
     spanSeconds: 3600,
     unit: "minutes",
     ticks: 12,
-    marks: [{ label: "Earliest known writing", yearsAgo: 5_200, at: `${Math.round(secondsBeforeBirthday(5_200) / 60)} minutes before` }],
+    marks: [{ label: "Earliest known writing", yearsAgo: 5_100, at: `${Math.round(secondsBeforeBirthday(5_100) / 60)} minutes before` }],
   },
   {
     title: "The last minute",

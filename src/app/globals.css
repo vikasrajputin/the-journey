@@ -599,3 +599,8 @@ html[data-motion="reduce"] *::after {
   }
   .annot-button[aria-pressed="true"] .annot-num { background: var(--chapter-accent); color: var(--color-night); }
 }
+
+@layer components {
+  html:not([data-js]) .source-filter { display: none; }
+  [data-source-item][hidden], [data-source-group][hidden] { display: none; }
+}

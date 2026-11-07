@@ -12,7 +12,7 @@ describe("lifetime scale exhibit", () => {
     expect(text).toMatch(/53 years and 8 months/);
     expect(secondsBeforeBirthday(66e6) / (365.25 * 24 * 3600 / 12)).toBeCloseTo(4.6, 1);
     expect(Math.round(secondsBeforeBirthday(300_000) / 3600)).toBe(15);
-    expect(Math.round(secondsBeforeBirthday(5_200) / 60)).toBe(16);
+    expect(Math.round(secondsBeforeBirthday(5_100) / 60)).toBe(16);
     expect(Math.round(secondsBeforeBirthday(80))).toBe(15);
   });
 });
