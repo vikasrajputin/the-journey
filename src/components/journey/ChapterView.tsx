@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import Link from "next/link";
 import type { Chapter } from "@/lib/content-schema";
 import { getAdjacentChapters } from "@/data/navigation";
@@ -11,12 +12,23 @@ import { NarrativeBlock } from "./NarrativeBlock";
 import { ChapterTransition } from "./ChapterTransition";
 import { SectionNav } from "./SectionNav";
 import { ChapterProgress } from "@/components/layout/ChapterProgress";
+import { SplitWords } from "@/components/motion/SplitWords";
+import { scenes } from "@/components/experience/scene-data";
+import { heroMedia } from "@/lib/chapter-media";
+import { media, type ResolvedMedia } from "@/lib/media";
+import { MediaSlide } from "./MediaSlide";
 
 /** The full chapter: header, narrative, evidence, deeper reading, sources and transition. */
 export function ChapterView({ chapter }: { chapter: Chapter }) {
   const { previous, next } = getAdjacentChapters(chapter.slug);
   const { citations, terms } = collectChapterRefs(chapter);
   const sourceList = chapterSourceIds(chapter).map(getSource).filter((s) => s !== undefined);
+
+  // More photos and videos from this chapter's part of the experience, one between each pair of sections.
+  const slides = (scenes.find((sc) => sc.chapter === chapter.slug)?.media ?? [])
+    .filter((id) => id !== heroMedia[chapter.slug]?.media)
+    .map((id) => media[id])
+    .filter((m): m is ResolvedMedia => !!m && m.kind !== "audio");
 
   const toc = [
     ...chapter.sections.map((s) => ({ id: s.id, title: s.title })),
@@ -48,16 +60,18 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
           </div>
 
           {chapter.sections.map((section, si) => (
-            <section key={section.id} id={section.id} aria-labelledby={`${section.id}-title`} className="chapter-section">
+            <Fragment key={section.id}>
+            {si > 0 && slides[si - 1] ? <MediaSlide m={slides[si - 1]} flip={si % 2 === 0} /> : null}
+            <section id={section.id} aria-labelledby={`${section.id}-title`} className="chapter-section">
               <div className="mx-auto max-w-[var(--width-reading)]">
-                <div className="flex items-baseline gap-4" data-reveal>
-                  <span aria-hidden="true" className="font-display text-sm tabular-nums text-chapter">
+                <div className="section-head" data-reveal>
+                  <span aria-hidden="true" className="section-num">
                     {String(si + 1).padStart(2, "0")}
                   </span>
                   <div>
-                    {section.kicker ? <p className="eyebrow text-muted">{section.kicker}</p> : null}
+                    {section.kicker ? <p className="eyebrow text-chapter">{section.kicker}</p> : null}
                     <h2 id={`${section.id}-title`} className="mt-1 font-display text-[length:var(--text-h2)] text-text-light">
-                      {section.title}
+                      <SplitWords text={section.title} />
                     </h2>
                   </div>
                 </div>
@@ -68,6 +82,7 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
                 </div>
               </div>
             </section>
+            </Fragment>
           ))}
 
           {chapter.evidence.length ? (
