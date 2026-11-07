@@ -1,4 +1,5 @@
 import type { Chapter } from "@/lib/content-schema";
+import Link from "next/link";
 import { chapters } from "@/data/navigation";
 import { ChapterBackdrop } from "./ChapterBackdrop";
 
@@ -34,6 +35,11 @@ export function ChapterHeader({ chapter }: { chapter: Chapter }) {
             <dd className="mt-2 text-text-light/90">{chapter.orientation.scale}</dd>
           </div>
         </dl>
+        <p className="mt-5 text-sm">
+          <Link href={`/timeline?chapter=${chapter.slug}`} className="link-quiet text-muted hover:text-text-light">
+            See this chapter on the full timeline →
+          </Link>
+        </p>
       </div>
     </header>
   );

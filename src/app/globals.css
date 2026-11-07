@@ -473,3 +473,129 @@ html[data-motion="reduce"] *::after {
 
   .deep-dive[open] > summary::after { transform: rotate(45deg); }
 }
+
+/* ---------- Timeline explorer ---------- */
+@layer components {
+  /* The explorer needs JavaScript; without it the full text list below carries everything. */
+  html:not([data-js]) .timeline-explorer { display: none; }
+
+  .zoom-button {
+    min-height: 2.75rem;
+    padding: 0 1rem;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 999px;
+    font-size: 0.875rem;
+    color: var(--color-text-light);
+    background: var(--color-panel);
+    transition: border-color 150ms, background-color 150ms;
+  }
+  .zoom-button:hover:not(:disabled) { border-color: var(--color-accent); }
+  .zoom-button[aria-pressed="true"] { background: var(--color-accent); border-color: var(--color-accent); color: var(--color-ink); }
+  .zoom-button:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .timeline-scroller {
+    overflow-x: auto;
+    padding: 0 0.75rem 0.5rem;
+    margin-inline: -0.75rem;
+    overscroll-behavior-x: contain;
+  }
+  .timeline-track { position: relative; min-width: 46rem; }
+  .timeline-band {
+    position: absolute;
+    top: 0;
+    bottom: 2.5rem;
+    border-left: 1px dashed var(--color-border-dark);
+  }
+  .timeline-band:nth-child(even) { background: color-mix(in srgb, var(--color-panel) 55%, transparent); }
+  .timeline-band-label {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.6rem;
+    right: 0.4rem;
+    font-size: 0.7rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+  .timeline-axis {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 2.5rem;
+    height: 1px;
+    background: var(--color-border-dark);
+  }
+  .timeline-tick {
+    position: absolute;
+    bottom: 0.75rem;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 0.7rem;
+    color: var(--color-muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .timeline-tick[data-edge="start"] { transform: none; }
+  .timeline-tick[data-edge="end"] { transform: translateX(-100%); }
+  .timeline-marker {
+    position: absolute;
+    display: grid;
+    place-items: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 999px;
+  }
+  .timeline-marker > span {
+    width: 12px;
+    height: 12px;
+    border-radius: 999px;
+    background: var(--cat);
+    box-shadow: 0 0 0 2px var(--color-night);
+    transition: transform 150ms var(--ease-out);
+  }
+  .timeline-marker:hover > span { transform: scale(1.25); }
+  .timeline-marker[data-highlight] > span { box-shadow: 0 0 0 2px var(--color-night), 0 0 0 4px var(--color-text-light); }
+  .timeline-marker[aria-pressed="true"] > span {
+    width: 18px;
+    height: 18px;
+    box-shadow: 0 0 0 2px var(--color-night), 0 0 0 4px var(--cat);
+  }
+  .timeline-detail {
+    padding: 1.5rem;
+    border: 1px solid var(--color-border-dark);
+    border-left: 3px solid var(--cat);
+    border-radius: 0.75rem;
+    background: var(--color-panel);
+  }
+  @media (min-width: 768px) { .timeline-detail { padding: 2rem; } }
+}
+
+/* ---------- Annotated exhibits ---------- */
+@layer components {
+  .annot-button {
+    display: flex;
+    width: 100%;
+    min-height: 2.75rem;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.25rem 0.75rem;
+    border: 1px solid var(--color-border-dark);
+    border-radius: 0.6rem;
+    font-size: 0.9rem;
+    text-align: left;
+    color: var(--color-text-light);
+    transition: border-color 150ms, background-color 150ms;
+  }
+  .annot-button:hover { border-color: var(--chapter-accent); }
+  .annot-button[aria-pressed="true"] { border-color: var(--chapter-accent); background: color-mix(in srgb, var(--chapter-accent) 14%, transparent); }
+  .annot-num {
+    display: grid;
+    place-items: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-variant-numeric: tabular-nums;
+    background: var(--color-panel-raised);
+  }
+  .annot-button[aria-pressed="true"] .annot-num { background: var(--chapter-accent); color: var(--color-night); }
+}
