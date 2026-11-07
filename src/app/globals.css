@@ -30,6 +30,10 @@
 }
 
 @layer base {
+  html:has([data-chapter]) {
+    scroll-padding-top: calc(var(--header-height) + 3.5rem);
+  }
+
   html {
     color-scheme: dark;
     -webkit-text-size-adjust: 100%;
@@ -246,7 +250,14 @@ html[data-motion="reduce"] *::after {
 @layer components {
   .chapter-section {
     padding-top: var(--space-section);
-    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+
+  .chapter-progress {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 30;
+    background: color-mix(in srgb, var(--color-night) 88%, transparent);
+    backdrop-filter: blur(12px);
   }
 
   .glossary-term {

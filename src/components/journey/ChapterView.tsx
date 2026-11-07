@@ -10,6 +10,7 @@ import { ChapterHeader } from "./ChapterHeader";
 import { NarrativeBlock } from "./NarrativeBlock";
 import { ChapterTransition } from "./ChapterTransition";
 import { SectionNav } from "./SectionNav";
+import { ChapterProgress } from "@/components/layout/ChapterProgress";
 
 /** The full chapter: header, narrative, evidence, deeper reading, sources and transition. */
 export function ChapterView({ chapter }: { chapter: Chapter }) {
@@ -25,6 +26,8 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
   ];
 
   return (
+    <>
+    <ChapterProgress chapter={chapter} />
     <article data-theme={chapter.theme} aria-labelledby="chapter-title" data-chapter={chapter.slug}>
       <ChapterHeader chapter={chapter} />
 
@@ -143,5 +146,6 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
       <GlossaryPopovers ids={terms} />
       <SourcePopovers citations={citations} />
     </article>
+    </>
   );
 }

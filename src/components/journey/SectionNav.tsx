@@ -28,7 +28,7 @@ export function SectionNav({ items }: { items: Item[] }) {
 
   return (
     <nav aria-label="In this chapter" className="hidden lg:block">
-      <div className="sticky top-[calc(var(--header-height)+2rem)] pt-20">
+      <div className="sticky top-[calc(var(--header-height)+4.5rem)] pt-20">
         <p className="eyebrow text-muted">In this chapter</p>
         <ol className="mt-4 grid gap-1 border-l border-border-dark text-sm">
           {items.map((item) => (
