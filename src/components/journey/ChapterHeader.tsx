@@ -86,6 +86,30 @@ export function ChapterHeader({ chapter }: { chapter: Chapter }) {
           </figure>
         ) : null}
 
+        <div className="reel-panel reel-about">
+          <p className="eyebrow text-chapter">Before you start</p>
+          <p className="reel-about-intro">{chapter.intro}</p>
+          <dl className="reel-about-facts">
+            <div>
+              <dt>When</dt>
+              <dd>{chapter.orientation.when}</dd>
+            </div>
+            <div>
+              <dt>Where</dt>
+              <dd>{chapter.orientation.where}</dd>
+            </div>
+            <div>
+              <dt>Scale</dt>
+              <dd>{chapter.orientation.scale}</dd>
+            </div>
+          </dl>
+          {chapter.evidence.length ? (
+            <a href="#evidence" className="reel-link">
+              Skip to the evidence for this chapter
+            </a>
+          ) : null}
+        </div>
+
         {chapter.sections.map((s, i) => {
           const m = more[i];
           return (
@@ -140,23 +164,6 @@ export function ChapterHeader({ chapter }: { chapter: Chapter }) {
         </div>
       </ReelTrack>
 
-      <div className="container-wide reel-facts">
-        <p className="reel-opening">{chapter.opening}</p>
-        <dl className="mt-10 grid max-w-5xl gap-px overflow-hidden rounded-xl border border-border-dark bg-border-dark text-sm sm:grid-cols-3">
-          <div className="bg-night p-4 md:p-5">
-            <dt className="eyebrow text-chapter">When</dt>
-            <dd className="mt-2 text-text-light/90">{chapter.orientation.when}</dd>
-          </div>
-          <div className="bg-night p-4 md:p-5">
-            <dt className="eyebrow text-chapter">Where</dt>
-            <dd className="mt-2 text-text-light/90">{chapter.orientation.where}</dd>
-          </div>
-          <div className="bg-night p-4 md:p-5">
-            <dt className="eyebrow text-chapter">Scale</dt>
-            <dd className="mt-2 text-text-light/90">{chapter.orientation.scale}</dd>
-          </div>
-        </dl>
-      </div>
     </header>
   );
 }
