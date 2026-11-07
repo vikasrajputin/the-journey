@@ -17,6 +17,8 @@ import { scenes } from "@/components/experience/scene-data";
 import { heroMedia } from "@/lib/chapter-media";
 import { media, type ResolvedMedia } from "@/lib/media";
 import { MediaSlide } from "./MediaSlide";
+import { EraWarp } from "./EraWarp";
+import { eras } from "@/lib/era-warp";
 
 /** The full chapter: header, narrative, evidence, deeper reading, sources and transition. */
 export function ChapterView({ chapter }: { chapter: Chapter }) {
@@ -40,6 +42,11 @@ export function ChapterView({ chapter }: { chapter: Chapter }) {
   return (
     <>
     <ChapterProgress chapter={chapter} />
+    {eras[chapter.slug] ? (
+      <div data-theme={chapter.theme}>
+        <EraWarp era={eras[chapter.slug]} question={chapter.centralQuestion} slug={chapter.slug} />
+      </div>
+    ) : null}
     <article data-theme={chapter.theme} aria-labelledby="chapter-title" data-chapter={chapter.slug}>
       <ChapterHeader chapter={chapter} />
 
