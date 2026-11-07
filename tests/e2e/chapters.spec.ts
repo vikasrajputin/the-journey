@@ -69,3 +69,12 @@ test("reading progress advances and the home page offers to continue", async ({ 
   await page.goto("/");
   await expect(page.getByRole("link", { name: /Continue: Chapter 6/ })).toBeVisible();
 });
+
+test("a chapter card grows into its chapter and leaves nothing covering the page", async ({ page }) => {
+  await page.goto("/journey");
+  await page.getByRole("link", { name: /^Chapter 2 A Planet Is Born/ }).click();
+  await expect(page).toHaveURL(/\/journey\/planet-earth$/);
+  await expect(page.getByRole("heading", { level: 1, name: "A Planet Is Born" })).toBeVisible();
+  await expect(page.locator(".expand-clone")).toHaveCount(0);
+  await expect(page.locator("html")).not.toHaveAttribute("data-expanding", "");
+});

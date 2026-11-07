@@ -181,13 +181,13 @@
 @media (prefers-reduced-motion: no-preference) {
   html[data-js]:not([data-motion="reduce"]) [data-reveal]:not([data-revealed]) {
     opacity: 0;
-    transform: translateY(16px);
+    transform: translateY(36px);
   }
 
   html[data-js]:not([data-motion="reduce"]) [data-reveal] {
     transition:
-      opacity 700ms var(--ease-out),
-      transform 700ms var(--ease-out);
+      opacity 800ms var(--ease-out),
+      transform 1000ms var(--ease-out);
   }
 }
 

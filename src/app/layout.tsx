@@ -6,7 +6,9 @@ import { RevealObserver } from "@/components/layout/RevealObserver";
 import { SmoothScroll } from "@/components/motion/SmoothScroll";
 import { Cursor } from "@/components/motion/Cursor";
 import { PageTransition } from "@/components/motion/PageTransition";
+import { Parallax } from "@/components/motion/Parallax";
 import "@/styles/motion.css";
+import "@/styles/showcase.css";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 
@@ -74,6 +76,7 @@ export default function RootLayout({
         <RevealObserver />
         <SmoothScroll />
         <PageTransition />
+        <Parallax />
         <Cursor />
       </body>
     </html>

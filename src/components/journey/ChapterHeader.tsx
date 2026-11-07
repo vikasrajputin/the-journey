@@ -4,19 +4,9 @@ import Link from "next/link";
 import { chapters } from "@/data/navigation";
 import { ChapterBackdrop } from "./ChapterBackdrop";
 import { media } from "@/lib/media";
+import { heroMedia } from "@/lib/chapter-media";
+import { ExpandLanding } from "./ExpandLanding";
 
-const heroMedia: Record<string, { media: string; scene: string }> = {
-  "before-everything": { media: "hubble-zoom", scene: "beginning" },
-  "planet-earth": { media: "lava", scene: "planet" },
-  "first-life": { media: "black-smoker", scene: "life" },
-  diversification: { media: "marrella", scene: "explosion" },
-  "age-of-giants": { media: "sue", scene: "giants" },
-  "human-story": { media: "campfire", scene: "humans" },
-  civilisation: { media: "pyramids", scene: "civilisation" },
-  "age-of-ideas": { media: "hudf", scene: "ideas" },
-  "world-we-built": { media: "city-lights", scene: "world" },
-  you: { media: "pale-blue-dot", scene: "you" },
-};
 
 /** Full-bleed photograph or video behind the chapter title. A failed load leaves the painted backdrop. */
 function ChapterHero({ slug }: { slug: string }) {
@@ -42,6 +32,7 @@ export function ChapterHeader({ chapter }: { chapter: Chapter }) {
     <header className="relative isolate flex min-h-[92svh] flex-col justify-end overflow-hidden border-b border-border-dark">
       <ChapterBackdrop theme={chapter.theme} />
       <ChapterHero slug={chapter.slug} />
+      <ExpandLanding />
       <div className="container-wide relative pt-28 pb-14 md:pt-40 md:pb-20">
         <p className="eyebrow text-chapter">
           Chapter {chapter.number} <span className="text-muted">of {chapters.length}</span>

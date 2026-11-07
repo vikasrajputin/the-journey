@@ -1,0 +1,375 @@
+/* Chapter list as big picture cards, the card-to-chapter move, and chapter scroll reveals.
+   Inspired by the feel of lusion.co's Featured Work; all code and styling are our own. */
+
+/* ---------- /journey header ---------- */
+.show-head {
+  padding-top: clamp(5rem, 3rem + 6vw, 9rem);
+  padding-bottom: clamp(2.5rem, 1.5rem + 3vw, 4.5rem);
+}
+.show-head-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1.25rem 3rem;
+  margin-top: 0.75rem;
+}
+.show-h1 {
+  font-family: var(--font-display);
+  font-size: clamp(3.4rem, 1.6rem + 8.5vw, 10.5rem);
+  font-weight: 500;
+  line-height: 0.9;
+  letter-spacing: -0.055em;
+}
+.show-side {
+  max-width: 21rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-text-light);
+  opacity: 0.8;
+}
+
+/* ---------- cards ---------- */
+.show-grid {
+  display: grid;
+  gap: 3.5rem clamp(1.25rem, 0.5rem + 2.5vw, 3rem);
+  list-style: none;
+  padding: 0;
+}
+@media (min-width: 760px) {
+  .show-grid {
+    grid-template-columns: 1fr 1fr;
+    padding-bottom: 7rem;
+  }
+  /* the right-hand column sits lower, so the two columns flow past each other */
+  .show-item:nth-child(even) {
+    position: relative;
+    top: 7rem;
+  }
+}
+.show-card {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+}
+.show-media {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 1.75rem;
+  background: var(--chapter-glow);
+  transform: translateZ(0);
+  transition: border-radius 0.8s var(--ease-expo);
+}
+.show-media-inner {
+  position: absolute;
+  inset: 0;
+  display: block;
+}
+.show-media-inner img,
+.show-media-inner video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 1.3s var(--ease-expo);
+}
+.show-media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 55%, rgb(8 11 18 / 0.55));
+  pointer-events: none;
+}
+.show-num {
+  position: absolute;
+  z-index: 1;
+  top: 1rem;
+  left: 1rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background: var(--chapter-accent);
+  color: #0b0e16;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+.show-go {
+  position: absolute;
+  z-index: 1;
+  right: 1rem;
+  bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.6rem 1rem;
+  border-radius: 999px;
+  background: #fff;
+  color: #0b0e16;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition:
+    transform 0.6s var(--ease-expo),
+    opacity 0.4s ease;
+}
+.show-text {
+  display: grid;
+  gap: 0.35rem;
+  margin-top: 1.25rem;
+  padding: 0 0.25rem;
+}
+.show-chip {
+  color: var(--chapter-accent);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+.show-title {
+  font-family: var(--font-display);
+  font-size: clamp(1.75rem, 1.2rem + 1.8vw, 2.9rem);
+  font-weight: 500;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+  color: var(--color-text-light);
+  background: linear-gradient(currentColor, currentColor) 0 100% / 0 2px no-repeat;
+  justify-self: start;
+  transition:
+    color 0.4s ease,
+    background-size 0.6s var(--ease-expo);
+}
+.show-q {
+  font-size: 1.1rem;
+  color: var(--color-text-light);
+  opacity: 0.9;
+}
+.show-time {
+  font-size: 0.875rem;
+  color: var(--color-muted);
+}
+.show-credit {
+  margin-top: 0.6rem;
+  padding: 0 0.25rem;
+  font-size: 0.7rem;
+  color: var(--color-muted);
+}
+.show-card:focus-visible {
+  outline: none;
+}
+.show-card:focus-visible .show-media {
+  outline: 3px solid var(--chapter-accent);
+  outline-offset: 4px;
+}
+@media (hover: hover) {
+  .show-go {
+    opacity: 0;
+    transform: translate3d(0, 0.75rem, 0) scale(0.9);
+  }
+  .show-card:hover .show-go,
+  .show-card:focus-visible .show-go {
+    opacity: 1;
+    transform: none;
+  }
+  .show-card:hover .show-media {
+    border-radius: 2.75rem;
+  }
+  .show-card:hover .show-media-inner img,
+  .show-card:hover .show-media-inner video {
+    transform: scale(1.07);
+  }
+  .show-card:hover .show-title {
+    color: var(--chapter-accent);
+    background-size: 100% 2px;
+  }
+}
+
+/* Scroll in: each card rises and its picture opens out of a smaller frame. */
+@media (prefers-reduced-motion: no-preference) {
+  /* no fade: the text stays fully readable and only slides, the picture opens up */
+  html[data-js]:not([data-motion]) .show-item[data-reveal] {
+    opacity: 1;
+    transition: transform 1.2s var(--ease-expo);
+    transition-delay: calc(var(--i) * 120ms);
+  }
+  html[data-js]:not([data-motion]) .show-item[data-reveal]:not([data-revealed]) {
+    opacity: 1;
+    transform: translate3d(0, 80px, 0);
+  }
+  html[data-js]:not([data-motion]) .show-item .show-media {
+    transition:
+      clip-path 1.4s var(--ease-expo),
+      border-radius 0.8s var(--ease-expo);
+    transition-delay: calc(var(--i) * 120ms), 0s;
+  }
+  html[data-js]:not([data-motion]) .show-item:not([data-revealed]) .show-media {
+    clip-path: inset(14% 8% 0 8% round 1.75rem);
+  }
+  html[data-js]:not([data-motion]) .show-item[data-revealed] .show-media {
+    clip-path: inset(0 0 0 0 round 0);
+  }
+}
+
+/* While a card grows to fill the screen, the rest of the list fades back. */
+.show-grid,
+.show-head {
+  transition: opacity 0.5s ease;
+}
+html[data-expanding] .show-grid,
+html[data-expanding] .show-head {
+  opacity: 0;
+}
+.expand-clone {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+  overflow: hidden;
+  pointer-events: none;
+  background: var(--color-night);
+  will-change: clip-path;
+}
+.expand-clone > div {
+  position: absolute;
+  inset: 0;
+  background-size: cover;
+  background-position: center;
+  will-change: transform;
+}
+/* the same shade the chapter's opening picture has, so the swap is invisible */
+.expand-clone::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(180deg, rgb(8 11 18 / 0.35) 0%, rgb(8 11 18 / 0.55) 45%, var(--color-night) 100%),
+    linear-gradient(90deg, rgb(8 11 18 / 0.75), transparent 70%);
+  animation: expand-shade 0.8s ease both;
+}
+@keyframes expand-shade {
+  from {
+    opacity: 0;
+  }
+}
+
+/* ---------- inside a chapter ---------- */
+.section-head {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(0.9rem, 0.5rem + 1.5vw, 1.75rem);
+}
+.section-num {
+  flex: none;
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 2rem + 4vw, 5.5rem);
+  font-weight: 600;
+  line-height: 0.85;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+  color: transparent;
+  -webkit-text-stroke: 1.5px var(--chapter-accent);
+}
+
+.media-slide {
+  margin-top: var(--space-section);
+  /* the caption slides in from the side; never let it widen the page on phones */
+  overflow-x: clip;
+}
+.media-slide-frame {
+  position: relative;
+  overflow: hidden;
+  aspect-ratio: 16 / 9;
+  border-radius: 1.75rem;
+  background: var(--chapter-glow);
+  transform: translateZ(0);
+}
+@media (max-width: 700px) {
+  .media-slide-frame {
+    aspect-ratio: 4 / 5;
+    border-radius: 1.25rem;
+  }
+}
+.media-slide-inner {
+  position: absolute;
+  inset: 0;
+}
+.media-slide-inner picture,
+.media-slide-inner img,
+.media-slide-inner video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.media-slide-cap {
+  display: grid;
+  gap: 0.35rem;
+  max-width: 40rem;
+  margin-top: 1rem;
+}
+.media-slide.flip .media-slide-cap {
+  margin-left: auto;
+  text-align: right;
+}
+.media-slide-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1rem + 0.5vw, 1.4rem);
+  line-height: 1.3;
+  color: var(--color-text-light);
+}
+.media-slide-credit {
+  font-size: 0.75rem;
+  color: var(--color-muted);
+}
+.media-slide-credit a {
+  color: var(--chapter-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  /* sections and pictures arrive one by one */
+  html[data-js]:not([data-motion]) .section-num {
+    transition:
+      transform 1.1s var(--ease-expo),
+      opacity 0.8s ease;
+  }
+  html[data-js]:not([data-motion]) [data-reveal]:not([data-revealed]) .section-num {
+    opacity: 0;
+    transform: translate3d(-2.5rem, 0, 0);
+  }
+  html[data-js]:not([data-motion]) .media-slide-frame {
+    transition: clip-path 1.5s var(--ease-expo);
+  }
+  html[data-js]:not([data-motion]) .media-slide:not([data-revealed]) .media-slide-frame {
+    clip-path: inset(12% 10% 12% 10% round 1.75rem);
+  }
+  html[data-js]:not([data-motion]) .media-slide[data-revealed] .media-slide-frame {
+    clip-path: inset(0 0 0 0 round 0);
+  }
+  html[data-js]:not([data-motion]) .media-slide-inner img,
+  html[data-js]:not([data-motion]) .media-slide-inner video {
+    transition: transform 1.8s var(--ease-expo);
+  }
+  html[data-js]:not([data-motion]) .media-slide:not([data-revealed]) .media-slide-inner img,
+  html[data-js]:not([data-motion]) .media-slide:not([data-revealed]) .media-slide-inner video {
+    transform: scale(1.3);
+  }
+  html[data-js]:not([data-motion]) .media-slide-cap {
+    transition:
+      transform 1.1s var(--ease-expo) 0.3s,
+      opacity 0.8s ease 0.3s;
+  }
+  html[data-js]:not([data-motion]) .media-slide:not([data-revealed]) .media-slide-cap {
+    opacity: 0;
+    transform: translate3d(-3rem, 0, 0);
+  }
+  html[data-js]:not([data-motion]) .media-slide.flip:not([data-revealed]) .media-slide-cap {
+    transform: translate3d(3rem, 0, 0);
+  }
+}
