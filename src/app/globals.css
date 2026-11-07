@@ -239,3 +239,226 @@ html[data-motion="reduce"] *::after {
   0%, 100% { transform: scaleY(1); transform-origin: top; opacity: 1; }
   50% { transform: scaleY(0.4); transform-origin: top; opacity: 0.6; }
 }
+
+/* ------------------------------------------------------------------ */
+/* Narrative components                                                */
+/* ------------------------------------------------------------------ */
+@layer components {
+  .chapter-section {
+    padding-top: var(--space-section);
+    scroll-margin-top: calc(var(--header-height) + 1rem);
+  }
+
+  .glossary-term {
+    display: inline;
+    padding: 0;
+    font: inherit;
+    color: inherit;
+    background: none;
+    border: 0;
+    cursor: help;
+    text-decoration: underline dotted;
+    text-decoration-color: var(--chapter-accent);
+    text-decoration-thickness: 1.5px;
+    text-underline-offset: 0.22em;
+  }
+
+  .glossary-term:hover {
+    color: var(--chapter-accent);
+  }
+
+  .source-marker {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    min-height: 1.75rem;
+    padding: 0 0.5rem;
+    margin-left: 0.15rem;
+    vertical-align: 0.1em;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    color: var(--color-muted);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 999px;
+    transition: color 150ms ease, border-color 150ms ease;
+  }
+
+  .source-marker:hover {
+    color: var(--chapter-accent);
+    border-color: var(--chapter-accent);
+  }
+
+  /* Native popovers styled as a bottom sheet on small screens and a side card on large ones. */
+  .sheet-popover {
+    position: fixed;
+    inset: auto 0 0 0;
+    margin: 0;
+    width: 100%;
+    max-height: min(75dvh, 36rem);
+    overflow-y: auto;
+    padding: 1.25rem var(--gutter) calc(1.5rem + env(safe-area-inset-bottom));
+    background: var(--color-panel);
+    color: var(--color-text-light);
+    border: 0;
+    border-top: 1px solid var(--color-border-dark);
+    border-radius: 1.25rem 1.25rem 0 0;
+    box-shadow: 0 -20px 60px rgb(0 0 0 / 0.5);
+  }
+
+  @media (min-width: 768px) {
+    .sheet-popover {
+      inset: auto 1.5rem 1.5rem auto;
+      width: 26rem;
+      padding: 1.5rem;
+      border: 1px solid var(--color-border-dark);
+      border-radius: 1rem;
+      box-shadow: 0 24px 80px rgb(0 0 0 / 0.55);
+    }
+  }
+
+  .sheet-popover::backdrop {
+    background: rgb(8 11 18 / 0.35);
+  }
+
+  .review-note {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: #f0d9b5;
+    background: rgb(214 169 108 / 0.08);
+    border: 1px dashed rgb(214 169 108 / 0.45);
+    border-radius: 0.5rem;
+  }
+
+  .pullquote {
+    margin-block: 2.5rem;
+    padding-left: 1.5rem;
+    border-left: 2px solid var(--chapter-accent);
+  }
+
+  .pullquote p {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.2rem + 1.4vw, 2.25rem);
+    line-height: 1.25;
+    color: var(--color-text-light);
+  }
+
+  .callout {
+    margin-block: 2rem;
+    padding: 1.25rem 1.25rem 1.5rem;
+    background: var(--color-panel);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 1rem;
+  }
+
+  .callout .eyebrow { color: var(--color-muted); }
+  .callout-uncertainty { border-left: 3px solid var(--color-accent-cool); }
+  .callout-uncertainty .eyebrow { color: var(--color-accent-cool); }
+  .callout-misconception { border-left: 3px solid var(--color-accent); }
+  .callout-misconception .eyebrow { color: var(--color-accent); }
+  .callout-analogy { border-left: 3px solid var(--chapter-accent); }
+  .callout-analogy .eyebrow { color: var(--chapter-accent); }
+
+  .keyfacts {
+    display: grid;
+    gap: 1px;
+    margin-block: 2rem;
+    overflow: hidden;
+    background: var(--color-border-dark);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 1rem;
+  }
+
+  @media (min-width: 640px) {
+    .keyfacts { grid-template-columns: repeat(auto-fit, minmax(11rem, 1fr)); }
+  }
+
+  .keyfact {
+    padding: 1.25rem;
+    background: var(--color-ink);
+  }
+
+  .narrative-list {
+    display: grid;
+    gap: 0.75rem;
+    padding-left: 1.25rem;
+    list-style: disc;
+  }
+
+  .narrative-list li::marker { color: var(--chapter-accent); }
+
+  .exhibit {
+    padding: 1.5rem;
+    background: linear-gradient(180deg, var(--color-panel), var(--color-ink));
+    border: 1px solid var(--color-border-dark);
+    border-radius: 1.25rem;
+  }
+
+  @media (min-width: 768px) {
+    .exhibit { padding: 2rem; }
+  }
+
+  /* Exhibits break out of the reading column on wide screens. */
+  .exhibit-breakout { margin-block: 3rem; }
+  @media (min-width: 1024px) {
+    .exhibit-breakout { margin-inline: -6rem; }
+  }
+
+  .evidence-card {
+    padding: 1.5rem;
+    background: var(--color-ink);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 1rem;
+  }
+
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.3rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    border: 1px solid currentColor;
+    border-radius: 999px;
+  }
+
+  .status-well-established { color: #9fd3b8; }
+  .status-strong-evidence { color: #a9d0dc; }
+  .status-active-research { color: #e3c78f; }
+  .status-debated { color: #e6a98c; }
+  .status-hypothesis { color: #c4b5e8; }
+  .status-unknown { color: var(--color-muted); }
+
+  .deep-dive {
+    padding: 1rem 1.25rem;
+    background: var(--color-ink);
+    border: 1px solid var(--color-border-dark);
+    border-radius: 1rem;
+  }
+
+  .deep-dive > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-height: 2.75rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .deep-dive > summary::-webkit-details-marker { display: none; }
+
+  .deep-dive > summary::after {
+    content: "+";
+    font-size: 1.5rem;
+    color: var(--chapter-accent);
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .deep-dive[open] > summary::after { transform: rotate(45deg); }
+}
