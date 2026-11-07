@@ -9,7 +9,6 @@ import { scenes } from "./scene-data";
 import { SoundEngine, type Sfx } from "./sound-engine";
 import { AmbientPlayer } from "./ambient";
 import { GateGL, type GateGLHandle } from "./GateGL";
-import { SplitWords } from "@/components/motion/SplitWords";
 import { LiveNow } from "./LiveNow";
 import { ScaleZoom } from "./ScaleZoom";
 import { askMotionPermission, buzz, startTilt, stopTilt } from "./tilt";
@@ -38,6 +37,9 @@ const SCENE_COMPONENTS = {
   world: WorldScene,
   you: YouScene,
 } as const;
+
+/** One bright colour per letter of the title, taken from the chapter colours. */
+const TITLE_COLOURS = ["#ff5f6d", "#ffb347", "#ffe14d", "#7dff7a", "#3ee0ff", "#4f8bff", "#b36bff", "#ff6bd6", "#ff9a3c", "#5cf2a0"];
 
 /** Vibration on Android phones for the big physical moments. */
 const HAPTICS: Partial<Record<Sfx, number | number[]>> = {
@@ -197,11 +199,22 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
           <div className="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" data-leaving={leaving || undefined}>
             <GateGL ref={gl} still={reduced} />
             <div className="gate-inner">
-              <p className="gate-eyebrow">An immersive journey through 13.8 billion years</p>
+              <p className="gate-eyebrow">A trip through 13.8 billion years</p>
               <p id="gate-title" className="gate-title">
-                <SplitWords text="THE JOURNEY" />
+                <span className="sr-only">THE JOURNEY</span>
+                <span className="gate-letters" aria-hidden="true">
+                  {["THE", "JOURNEY"].map((word, w) => (
+                    <span key={word} className="gate-word">
+                      {word.split("").map((ch, i) => (
+                        <span key={i} className="gate-letter" style={{ "--i": w * 3 + i, color: TITLE_COLOURS[(w * 3 + i) % TITLE_COLOURS.length] } as React.CSSProperties}>
+                          {ch}
+                        </span>
+                      ))}
+                    </span>
+                  ))}
+                </span>
               </p>
-              <p className="gate-sub">From the first light of the universe to you. Ten worlds to step into, see, touch and hear.</p>
+              <p className="gate-sub">From the very first light in the universe, all the way to you. Ten worlds to explore, touch and hear!</p>
               <div className="gate-buttons">
                 <button type="button" className="gate-primary" onClick={() => enter(true)} autoFocus>
                   <span className="pulse-dot" aria-hidden="true" /> Enter with sound
@@ -210,7 +223,7 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
                   Enter in silence
                 </button>
               </div>
-              <p className="gate-hint">Best with headphones. Scroll or swipe to travel through time. Tap and drag to interact.</p>
+              <p className="gate-hint">Put on headphones! Scroll or swipe to travel through time. Tap things to play with them.</p>
               <div className="mt-3">
                 <ContinueJourney />
               </div>

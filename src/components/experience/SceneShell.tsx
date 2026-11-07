@@ -97,7 +97,7 @@ export function SceneShell({
 
         <header className="scene-head">
           <p className="scene-eyebrow">
-            Chapter {def.number} <span aria-hidden="true">·</span> {def.beats[beat]?.when ?? def.beats[0].when}
+            <span className="scene-chip">Chapter {def.number}</span> {def.beats[beat]?.when ?? def.beats[0].when}
           </p>
           <h2 id={`${def.id}-title`} className="scene-title" tabIndex={-1}>
             <SplitWords text={def.title} />
@@ -124,19 +124,19 @@ export function SceneShell({
         <div className="scene-captions">
           {def.beats.map((b, i) => (
             <p key={i} className="scene-caption" data-on={i === beat || undefined}>
-              <SplitWords text={b.text} whole />
+              <SplitWords text={b.text} whole highlight />
             </p>
           ))}
         </div>
 
         <div className="scene-foot">
           <button type="button" className="scene-proof" onClick={openProof}>
-            See the proof
+            How do we know?
             {orgs.length ? <span className="scene-proof-orgs">· {orgs.join(" · ")}</span> : null}
           </button>
           {def.artefacts?.length ? <Artefacts items={def.artefacts} sceneId={def.id} /> : null}
           <Link href={`/journey/${def.chapter}/`} className="scene-deeper">
-            Go deeper <span aria-hidden="true">→</span>
+            Read more <span aria-hidden="true">→</span>
             <span className="sr-only">: read chapter {def.number}, {def.title}</span>
           </Link>
           {credits.length ? (
