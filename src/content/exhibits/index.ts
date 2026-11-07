@@ -134,6 +134,7 @@ export const exhibits: readonly ExhibitDefinition[] = [
     caption: "A schematic map of Homo sapiens dispersals. Routes and dates are simplified and some are debated.",
     textAlternative:
       "Homo sapiens originated in Africa, with early fossils from Morocco, Ethiopia and South Africa, suggesting a pan-African origin. Some early groups reached Southwest Asia more than 100,000 years ago. A major, widely successful dispersal from Africa took place roughly 70,000 to 50,000 years ago, after which people spread across Asia, reached Australia by at least about 50,000 years ago (some estimates are earlier), entered Europe and met Neanderthals there, and later reached the Americas, by at least about 15,000 years ago and possibly earlier. Along the way, populations interbred with Neanderthals and Denisovans.",
+    credit: "Map outlines from Natural Earth (public domain)",
     sourceIds: ["nhm-homo-sapiens", "hublin-2017-irhoud", "green-2010-neandertal"],
   },
 
@@ -145,6 +146,7 @@ export const exhibits: readonly ExhibitDefinition[] = [
     caption: "Some of the regions where plants or animals were domesticated independently. Dates are approximate starting points, and each transition took centuries to millennia.",
     textAlternative:
       "Southwest Asia (the Fertile Crescent): wheat, barley, lentils, sheep and goats, from roughly 11,000 to 10,000 years ago. China: rice in the Yangtze region and millets in the north, from roughly 9,000 years ago. Mesoamerica: maize, beans and squash, with squash from about 10,000 years ago and maize from about 9,000 years ago. South America: potatoes, quinoa and llamas. Africa: sorghum, pearl millet and yams. New Guinea: taro and bananas. Eastern North America: sunflowers and other seed crops. Each began independently, using local plants and animals.",
+    credit: "Map outlines from Natural Earth (public domain)",
     sourceIds: ["larson-2014-domestication", "fuller-2014-convergent", "maize-2016", "pearl-millet-2018"],
   },
   {
