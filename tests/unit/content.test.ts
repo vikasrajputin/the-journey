@@ -57,3 +57,17 @@ describe("time convention", () => {
     expect(yearToYearsAgo(-3200)).toBe(5199);
   });
 });
+
+import { methods } from "@/content/methods";
+import { getSource as getSrc } from "@/data/sources";
+import { getChapterSummary as getSummary } from "@/data/navigation";
+
+describe("evidence methods", () => {
+  it("cite real sources and real chapters", () => {
+    for (const m of methods) {
+      expect(m.sourceIds.length).toBeGreaterThan(0);
+      for (const id of m.sourceIds) expect(getSrc(id), `${m.id} → ${id}`).toBeDefined();
+      for (const slug of m.chapters) expect(getSummary(slug), `${m.id} → ${slug}`).toBeDefined();
+    }
+  });
+});
