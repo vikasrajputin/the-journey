@@ -313,8 +313,8 @@ html[data-js] .gate {
   z-index: 6;
   pointer-events: none;
   background:
-    linear-gradient(180deg, rgb(0 0 0 / 0.55) 0%, transparent 22%, transparent 55%, rgb(0 0 0 / 0.75) 100%),
-    radial-gradient(ellipse at center, transparent 55%, rgb(0 0 0 / 0.45));
+    linear-gradient(180deg, rgb(0 0 0 / 0.45) 0%, transparent 20%, transparent 60%, rgb(0 0 0 / 0.6) 100%),
+    radial-gradient(ellipse at center, transparent 65%, rgb(0 0 0 / 0.25));
 }
 
 .scene-head {
@@ -663,12 +663,12 @@ html[data-motion="reduce"] .kenburns {
 }
 
 /* Painted backdrops: shown while photographs load, or if they cannot. */
-.scene[data-theme="life"] .scene-stage { background: radial-gradient(ellipse at 50% 85%, #1f3a3a, #04121a 60%, #01060a); }
-.scene[data-theme="giants"] .scene-stage { background: linear-gradient(180deg, #1d2a22, #0c140f 60%, #050806); }
-.scene[data-theme="human"] .scene-stage { background: radial-gradient(ellipse at 50% 70%, #4a2c1a, #1e120b 55%, #080504); }
-.scene[data-theme="civilisation"] .scene-stage { background: linear-gradient(180deg, #2c3550 0%, #a7704a 62%, #5b3f26 78%, #2a1d12); }
-.scene[data-theme="built"] .scene-stage { background: radial-gradient(ellipse at 50% 120%, #1b3c6b 0%, #0a1a33 35%, #02040a 60%); }
-.scene[data-theme="you"] .scene-stage { background: linear-gradient(115deg, #020205 30%, #2a1f18 48%, #4a3a2c 50%, #2a1f18 52%, #020205 70%); }
+.scene[data-theme="life"] .scene-stage { background: radial-gradient(ellipse at 50% 85%, #0f6b6b, #062a3a 55%, #020c14); }
+.scene[data-theme="giants"] .scene-stage { background: linear-gradient(180deg, #1f5a3a, #0e2c1a 60%, #06120a); }
+.scene[data-theme="human"] .scene-stage { background: radial-gradient(ellipse at 50% 70%, #8a3f12, #3a1608 55%, #0c0402); }
+.scene[data-theme="civilisation"] .scene-stage { background: linear-gradient(180deg, #2a3f8f 0%, #e0863f 62%, #8a4a1c 78%, #3a1d0a); }
+.scene[data-theme="built"] .scene-stage { background: radial-gradient(ellipse at 50% 120%, #1f66d6 0%, #0b2a66 35%, #020614 62%); }
+.scene[data-theme="you"] .scene-stage { background: linear-gradient(115deg, #020205 30%, #3a2410 48%, #8a5a28 50%, #3a2410 52%, #020205 70%); }
 
 /* Chapter pages: a full-bleed photograph or film behind the title */
 .chapter-hero {
@@ -751,7 +751,7 @@ html[data-motion="reduce"] .kenburns {
   border-radius: 0.75rem;
   background: rgb(0 0 0 / 0.5);
   backdrop-filter: blur(8px);
-  border: 1px dashed rgb(180 170 200 / 0.55);
+  border: 1px dashed rgb(194 168 255 / 0.7);
   font-size: 0.72rem;
   line-height: 1.35;
   color: rgb(235 230 255 / 0.95);
@@ -766,11 +766,11 @@ html[data-motion="reduce"] .kenburns {
   width: 0.5rem;
   height: 0.5rem;
   border-radius: 50%;
-  border: 1.5px dashed #b4aac8;
+  border: 1.5px dashed #c2a8ff;
 }
 [data-real] > .scene-see-dot {
   border: none;
-  background: #9cc5a8;
+  background: #5cf2a0;
 }
 .scene-counter {
   top: calc(13.5rem + env(safe-area-inset-top));

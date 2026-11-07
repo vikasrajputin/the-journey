@@ -14,6 +14,7 @@ const VERT = /* glsl */ `
   attribute float aSize;
   varying float vAlpha;
   varying float vWarm;
+  varying float vPink;
 
   void main() {
     vec3 p = position;
@@ -40,20 +41,25 @@ const VERT = /* glsl */ `
     gl_Position = projectionMatrix * mv;
     gl_PointSize = aSize * uPixel * (2.2 / -mv.z) * (1.0 + push * 2.0);
     vAlpha = (0.35 + 0.65 * fract(aSeed * 13.7)) * (1.0 - uBurst);
-    vWarm = smoothstep(1.4, 0.0, r);
+    vWarm = smoothstep(1.2, 0.0, r);
+    vPink = step(0.96, fract(aSeed * 71.3)) * smoothstep(0.3, 0.9, r);
   }
 `;
 
 const FRAG = /* glsl */ `
   varying float vAlpha;
   varying float vWarm;
+  varying float vPink;
   void main() {
     vec2 c = gl_PointCoord - 0.5;
     float d = length(c);
     float a = smoothstep(0.5, 0.0, d);
-    vec3 cool = vec3(0.80, 0.84, 0.92);
-    vec3 warm = vec3(1.0, 0.86, 0.66);
-    gl_FragColor = vec4(mix(cool, warm, vWarm), a * vAlpha);
+    // blue-white arms, a golden core, and scattered pink star-forming knots
+    vec3 cool = vec3(0.45, 0.66, 1.0);
+    vec3 warm = vec3(1.0, 0.78, 0.42);
+    vec3 col = mix(cool, warm, vWarm);
+    col = mix(col, vec3(1.0, 0.42, 0.72), vPink);
+    gl_FragColor = vec4(col, a * vAlpha);
   }
 `;
 

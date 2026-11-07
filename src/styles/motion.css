@@ -51,10 +51,10 @@ html[data-js]:not([data-motion]) .scene-caption .split-w > span {
     opacity 0.6s ease;
 }
 /* Shown: active scene titles, the current caption, revealed headings, the gate */
-html[data-js]:not([data-motion]) .scene[data-active] .scene-title .split-w > span,
 html[data-js]:not([data-motion]) .scene-caption[data-on] .split-w > span {
   opacity: 1;
 }
+html[data-js]:not([data-motion]) .scene[data-active] .scene-title .split-w > span,
 html[data-js]:not([data-motion]) .scene-caption[data-on] .split-w > span,
 html[data-js]:not([data-motion]) [data-revealed] .split-w > span,
 html[data-js]:not([data-motion]) [data-revealed].split-w > span {
@@ -221,4 +221,26 @@ html[data-cursor] .cursor-dot {
 /* ---------- Captions and panels: eased fades ---------- */
 .scene-caption {
   transition: opacity 0.6s var(--ease-expo);
+}
+
+/* Phones: keep the scene buttons on one row so they never cover the caption. */
+@media (max-width: 640px) {
+  .scene-foot {
+    gap: 0.5rem;
+    flex-wrap: nowrap;
+  }
+  .scene-foot .scene-proof,
+  .scene-foot .scene-deeper {
+    padding: 0 0.85rem;
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+  .scene-3d .scene-3d-long {
+    display: none;
+  }
+}
+@media (min-width: 641px) {
+  .scene-3d .scene-3d-short {
+    display: none;
+  }
 }
