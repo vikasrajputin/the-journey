@@ -7,7 +7,11 @@ for (const slug of slugs) {
   test(`chapter ${slug} renders from content with no accessibility violations`, async ({ page }) => {
     const errors: string[] = [];
     page.on("pageerror", (e) => errors.push(e.message));
-    page.on("console", (m) => m.type() === "error" && errors.push(m.text()));
+    page.on("console", (m) => {
+      // Photos and films load from Wikimedia, which this test sandbox may not reach.
+      const remote = m.text().startsWith("Failed to load resource") && /wikimedia\.org/.test(m.location().url);
+      if (m.type() === "error" && !remote) errors.push(m.text());
+    });
     await page.goto(`/journey/${slug}`);
     await expect(page.locator("h1")).toHaveCount(1);
     expect(await page.locator("article section h2").count()).toBeGreaterThanOrEqual(3);
@@ -23,6 +27,8 @@ test("glossary term opens a definition without moving the page, and Escape close
   await page.goto("/journey/before-everything");
   const term = page.getByRole("button", { name: /redshift: show definition/ }).first();
   await term.scrollIntoViewIfNeeded();
+  // Let the scroll and any late layout (hero media, fonts) settle before measuring.
+  await expect.poll(async () => { const a = await page.evaluate(() => window.scrollY); await page.waitForTimeout(150); return a === (await page.evaluate(() => window.scrollY)); }).toBe(true);
   const before = await page.evaluate(() => window.scrollY);
   await term.click();
   const panel = page.locator("#glossary-redshift");

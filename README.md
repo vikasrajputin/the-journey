@@ -55,3 +55,13 @@ Next.js 15 (App Router, fully static), React 19, TypeScript, Tailwind CSS 4, nex
 - [CONTENT_GUIDE.md](CONTENT_GUIDE.md): writing and editing content
 - [SOURCES.md](SOURCES.md): sourcing policy, verification status and open editorial items
 - [ACCESSIBILITY.md](ACCESSIBILITY.md): accessibility approach, testing and known limitations
+
+## The immersive journey (home page)
+
+The home page is a full-screen, scroll-driven experience: ten scenes, one per chapter, under `src/components/experience/`.
+
+- **Scenes** (`scenes/*.tsx`) draw on canvas and react to scroll, taps, drags and holds. Each scene is a tall section with a sticky stage, so the page scrolls normally and is never hijacked.
+- **Words** live in `scene-data.ts`: short captions, read aloud by the browser's own speech voice when narration is on. Every claim comes from the chapter text, which carries the sources.
+- **Sound** (`sound-engine.ts`) is synthesised live with the Web Audio API: there are no audio files. The dinosaur call is a labelled reconstruction. Sound starts only after the visitor taps "Enter with sound".
+- **Photos and films** (`src/lib/media.ts`) are real files on Wikimedia Commons (NASA, ESA, NOAA and others), loaded straight from Wikimedia, with credits in each scene and at the end. If a file can't load, the scene's own artwork shows instead.
+- Motion respects `prefers-reduced-motion` and the site's "Reduce motion" toggle. Without JavaScript the home page shows the scene titles and first captions, and links to the chapters.
