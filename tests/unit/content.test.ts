@@ -71,3 +71,36 @@ describe("evidence methods", () => {
     }
   });
 });
+
+import { scenes } from "@/components/experience/scene-data";
+import { getSource } from "@/data/sources";
+
+describe("immersive journey", () => {
+  it("backs every caption with at least one registered source and labels what is shown", () => {
+    for (const scene of scenes) {
+      for (const beat of scene.beats) {
+        expect(beat.sources.length, beat.text).toBeGreaterThan(0);
+        for (const id of beat.sources) expect(getSource(id), `${scene.id}: ${id}`).toBeDefined();
+        expect(beat.see).toMatch(/^(Real|Simulation|Reconstructed)/);
+      }
+    }
+  });
+
+  it("labels every real sound, registers its sources, and credits it in the scene", () => {
+    for (const scene of scenes) {
+      if (!scene.sound) continue;
+      expect(scene.sound.label).toMatch(/^Real (recording|data as sound)/);
+      expect(scene.media).toContain(scene.sound.media);
+      for (const id of scene.sound.sources) expect(getSource(id), `${scene.id}: ${id}`).toBeDefined();
+    }
+  });
+
+  it("points 3D specimens at the Smithsonian only", () => {
+    for (const scene of scenes) {
+      for (const a of scene.artefacts ?? []) {
+        expect(a.page).toMatch(/^https:\/\/3d\.si\.edu\/object\/3d\//);
+        expect(a.embed).toMatch(/^https:\/\/3d-api\.si\.edu\/voyager\/3d_package:/);
+      }
+    }
+  });
+});

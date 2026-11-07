@@ -1,13 +1,17 @@
 import { expect, test } from "@playwright/test";
 import AxeBuilder from "@axe-core/playwright";
 
+const isRemoteMediaFailure = (msg: { text(): string; location(): { url: string } }) =>
+  msg.text().startsWith("Failed to load resource") && /wikimedia\.org/.test(msg.location().url);
+
 const routes = ["/", "/journey", "/journey/before-everything", "/journey/you", "/timeline", "/evidence", "/sources", "/about", "/glossary", "/search"];
 
 for (const route of routes) {
   test(`${route} loads without console errors or accessibility violations`, async ({ page }) => {
     const errors: string[] = [];
     page.on("console", (msg) => {
-      if (msg.type() === "error") errors.push(msg.text());
+      // Photos and films load from Wikimedia, which this test sandbox may not reach.
+      if (msg.type() === "error" && !isRemoteMediaFailure(msg)) errors.push(msg.text());
     });
     page.on("pageerror", (err) => errors.push(err.message));
 
@@ -45,12 +49,14 @@ test("content is visible without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Ten chapters, one continuous story" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Before Everything" })).toBeVisible();
+  await expect(page.locator(".scene-caption", { hasText: "13.8 billion years ago, everything we can see" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "ten chapters", exact: true })).toBeVisible();
   await context.close();
 });
 
 test("motion preference can be reduced and is remembered", async ({ page, isMobile }) => {
-  await page.goto("/");
+  await page.goto("/about");
   if (isMobile) await page.getByRole("button", { name: "Menu" }).click();
   await page.getByRole("button", { name: "Reduce motion" }).click();
   await expect(page.locator("html")).toHaveAttribute("data-motion", "reduce");
@@ -60,7 +66,7 @@ test("motion preference can be reduced and is remembered", async ({ page, isMobi
 
 test("mobile menu opens, navigates and closes with Escape", async ({ page, isMobile }) => {
   test.skip(!isMobile, "mobile only");
-  await page.goto("/");
+  await page.goto("/about");
   await page.getByRole("button", { name: "Menu" }).click();
   const dialog = page.getByRole("dialog", { name: "Site menu" });
   await expect(dialog).toBeVisible();
@@ -84,4 +90,17 @@ test("no page scrolls sideways from phone to wide desktop", async ({ browser }) 
     }
     await context.close();
   }
+});
+
+test("each scene labels what is real and opens its proof", async ({ page }) => {
+  await page.goto("/");
+  await page.getByRole("button", { name: "Enter in silence" }).click();
+  const scene = page.locator("#beginning");
+  await expect(scene.locator(".scene-see")).toContainText("Simulation");
+  await scene.getByRole("button", { name: /See the proof/ }).click();
+  const proof = page.getByRole("dialog", { name: "Before Everything" });
+  await expect(proof).toBeVisible();
+  await expect(proof.getByRole("link", { name: "WMAP Overview" })).toHaveAttribute("href", /nasa\.gov/);
+  await proof.getByRole("button", { name: "Close" }).click();
+  await expect(proof).toBeHidden();
 });
