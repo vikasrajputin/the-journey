@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { siteConfig } from "@/lib/site";
+import { ContinueJourney } from "./ContinueJourney";
 
 /**
  * The opening moment. The cosmic backdrop is pure CSS (no media download),
@@ -50,6 +51,7 @@ export function OpeningHero() {
           >
             Explore the timeline
           </Link>
+          <ContinueJourney />
         </div>
 
         <a

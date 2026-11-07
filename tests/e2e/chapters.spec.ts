@@ -51,3 +51,13 @@ test("chapters link forward and back", async ({ page }) => {
   await page.goBack();
   await expect(page).toHaveURL(/\/journey\/first-life$/);
 });
+
+test("reading progress advances and the home page offers to continue", async ({ page, isMobile }) => {
+  await page.goto("/journey/human-story");
+  const bar = page.locator(".chapter-progress [style]");
+  await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight / 2));
+  await expect.poll(async () => bar.evaluate((el) => (el as HTMLElement).style.transform)).not.toBe("scaleX(0)");
+  if (!isMobile) await expect(page.getByRole("link", { name: "Chapter 6: The Human Story Begins" })).toHaveAttribute("aria-current", "page");
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: /Continue: Chapter 6/ })).toBeVisible();
+});
