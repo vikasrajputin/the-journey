@@ -17,7 +17,8 @@ export function Artefacts({ items, sceneId }: { items: Artefact[]; sceneId: stri
   return (
     <>
       <button type="button" className="scene-proof scene-3d" onClick={() => dialog.current?.showModal()}>
-        <span aria-hidden="true">◎</span> Turn it in 3D
+        <span aria-hidden="true">◎</span> <span className="scene-3d-long">Turn it in 3D</span>
+        <span className="scene-3d-short">3D</span>
       </button>
       <dialog ref={dialog} className="proof artefacts" aria-labelledby={`${sceneId}-3d-title`} onClose={() => setPick(null)} onClick={(e) => e.target === e.currentTarget && close()}>
         <div className="proof-inner">

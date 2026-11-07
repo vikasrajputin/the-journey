@@ -192,7 +192,6 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
   return (
     <ExperienceContext.Provider value={api}>
       <div className="experience" data-entered={entered || undefined}>
-        <div className="grain" aria-hidden="true" />
         <h1 className="sr-only">THE JOURNEY: 13.8 billion years, from the first light to you</h1>
         {!entered ? (
           <div className="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" data-leaving={leaving || undefined}>
