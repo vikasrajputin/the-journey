@@ -209,42 +209,6 @@ html[data-motion="reduce"] *::after {
   }
 }
 
-/* Opening hero backdrop */
-.hero-nebula {
-  background:
-    radial-gradient(40% 35% at 30% 40%, rgb(120 100 200 / 0.38), transparent 70%),
-    radial-gradient(35% 30% at 72% 58%, rgb(214 169 108 / 0.24), transparent 70%),
-    radial-gradient(50% 40% at 55% 30%, rgb(131 183 199 / 0.14), transparent 70%);
-  filter: blur(20px);
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  html:not([data-motion="reduce"]) .hero-nebula {
-    animation: nebula-drift 60s ease-in-out infinite alternate;
-  }
-  html:not([data-motion="reduce"]) .hero-stars {
-    animation: stars-drift 120s linear infinite;
-  }
-  html:not([data-motion="reduce"]) .hero-cue {
-    animation: cue 2.4s ease-in-out 3;
-  }
-}
-
-@keyframes nebula-drift {
-  from { transform: translate3d(-2%, -1%, 0) scale(1); }
-  to { transform: translate3d(2%, 1.5%, 0) scale(1.06); }
-}
-
-@keyframes stars-drift {
-  from { background-position: 0 0; }
-  to { background-position: -420px 210px; }
-}
-
-@keyframes cue {
-  0%, 100% { transform: scaleY(1); transform-origin: top; opacity: 1; }
-  50% { transform: scaleY(0.4); transform-origin: top; opacity: 0.6; }
-}
-
 /* ------------------------------------------------------------------ */
 /* Narrative components                                                */
 /* ------------------------------------------------------------------ */
