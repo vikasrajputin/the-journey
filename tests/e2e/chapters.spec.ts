@@ -29,6 +29,8 @@ test("glossary term opens a definition without moving the page, and Escape close
   await term.scrollIntoViewIfNeeded();
   // Let the scroll and any late layout (hero media, fonts) settle before measuring.
   await expect.poll(async () => { const a = await page.evaluate(() => window.scrollY); await page.waitForTimeout(150); return a === (await page.evaluate(() => window.scrollY)); }).toBe(true);
+  // And let the section's reveal transition finish, so the click lands on a still target.
+  await term.evaluate((el) => Promise.all((el.closest("[data-reveal]") ?? el).getAnimations({ subtree: true }).map((a) => a.finished)));
   const before = await page.evaluate(() => window.scrollY);
   await term.click();
   const panel = page.locator("#glossary-redshift");

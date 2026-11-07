@@ -1,0 +1,224 @@
+/*
+ * Motion language: eased word-by-word reveals, a page curtain, a follower
+ * cursor and magnetic buttons. Only transform and opacity animate, so the
+ * browser can run everything on the GPU. All of it switches off when motion
+ * is reduced.
+ */
+:root {
+  --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-inout: cubic-bezier(0.76, 0, 0.24, 1);
+}
+
+/* Lenis owns wheel scrolling on desktop; native smooth-scroll would fight it. */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+html.lenis {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+/* ---------- Word-by-word reveals ---------- */
+.split-w {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  /* room for descenders inside the mask */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
+}
+.split-w > span {
+  display: inline-block;
+}
+html[data-js]:not([data-motion]) .split-w > span {
+  transform: translate3d(0, 108%, 0);
+  transition: transform 1s var(--ease-expo);
+  transition-delay: calc(min(var(--i), 24) * 32ms);
+}
+/* A whole caption: the mask wraps as a block, and the text rises with a fade. */
+.scene-caption .split-w {
+  display: block;
+}
+html[data-js]:not([data-motion]) .scene-caption .split-w > span {
+  display: block;
+  transform: translate3d(0, 40%, 0);
+  opacity: 0;
+  transition:
+    transform 0.9s var(--ease-expo),
+    opacity 0.6s ease;
+}
+/* Shown: active scene titles, the current caption, revealed headings, the gate */
+html[data-js]:not([data-motion]) .scene[data-active] .scene-title .split-w > span,
+html[data-js]:not([data-motion]) .scene-caption[data-on] .split-w > span {
+  opacity: 1;
+}
+html[data-js]:not([data-motion]) .scene-caption[data-on] .split-w > span,
+html[data-js]:not([data-motion]) [data-revealed] .split-w > span,
+html[data-js]:not([data-motion]) [data-revealed].split-w > span {
+  transform: none;
+}
+html[data-js]:not([data-motion]) .scene-caption:not([data-on]) .split-w > span {
+  transition-duration: 0.35s;
+  transition-delay: 0s;
+}
+html[data-js]:not([data-motion]) .split-load .split-w > span,
+html[data-js]:not([data-motion]) .gate .split-w > span {
+  animation: split-rise 1.2s var(--ease-expo) both;
+  animation-delay: calc(0.15s + var(--i) * 70ms);
+}
+@keyframes split-rise {
+  from {
+    transform: translate3d(0, 108%, 0);
+  }
+  to {
+    transform: none;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .split-w > span {
+    transform: none !important;
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+/* ---------- Big, tight display type ---------- */
+.scene-title,
+.gate-title,
+.live .scene-title,
+.scale .scene-title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: -0.045em;
+  line-height: 0.95;
+}
+.scene-title {
+  font-size: clamp(2.4rem, 1.2rem + 5.5vw, 6.5rem);
+}
+.gate-title {
+  font-size: clamp(3.2rem, 1rem + 11vw, 10rem);
+  letter-spacing: -0.05em;
+}
+.scene-caption {
+  font-family: var(--font-display);
+  font-weight: 450;
+  letter-spacing: -0.02em;
+}
+
+/* ---------- Gate: WebGL galaxy and its exit ---------- */
+.gate-gl {
+  position: absolute;
+  inset: 0;
+}
+.gate-gl canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.gate-inner {
+  transition: opacity 0.6s var(--ease-expo), transform 0.9s var(--ease-expo);
+}
+.gate {
+  transition: opacity 0.5s ease 0.35s;
+}
+.gate[data-leaving] {
+  opacity: 0;
+  pointer-events: none;
+}
+.gate[data-leaving] .gate-inner {
+  opacity: 0;
+  transform: scale(1.08);
+}
+
+/* ---------- Page curtain ---------- */
+.page-curtain {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  background: #0d0d0f;
+  color: var(--color-text-light);
+  transform: translate3d(0, 100%, 0);
+  pointer-events: none;
+  visibility: hidden;
+}
+.page-curtain span {
+  font-family: var(--font-display);
+  font-weight: 500;
+  letter-spacing: 0.3em;
+  font-size: 0.8rem;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+html[data-leaving] .page-curtain {
+  visibility: visible;
+  transform: none;
+  transition: transform 0.52s var(--ease-inout);
+}
+html[data-leaving] .page-curtain span {
+  opacity: 0.7;
+  transition-delay: 0.25s;
+}
+html[data-arriving] .page-curtain {
+  visibility: visible;
+  transform: translate3d(0, -100%, 0);
+  transition: transform 0.8s var(--ease-inout) 0.05s;
+}
+
+/* ---------- Follower cursor (mouse only) ---------- */
+.cursor-ring,
+.cursor-dot {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 300;
+  pointer-events: none;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.cursor-ring {
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid rgb(255 255 255 / 0.55);
+  mix-blend-mode: difference;
+}
+.cursor-dot {
+  width: 5px;
+  height: 5px;
+  background: #fff;
+  mix-blend-mode: difference;
+}
+html[data-cursor] .cursor-ring,
+html[data-cursor] .cursor-dot {
+  opacity: 1;
+}
+@media (pointer: coarse) {
+  .cursor-ring,
+  .cursor-dot {
+    display: none;
+  }
+}
+
+/* ---------- Magnetic buttons ---------- */
+.gate-primary,
+.gate-secondary,
+.scene-proof,
+.scene-deeper,
+.hud-btn,
+.scene-action-inline,
+.magnetic {
+  transition:
+    translate 0.5s var(--ease-expo),
+    background 0.2s,
+    transform 0.2s;
+}
+
+/* ---------- Captions and panels: eased fades ---------- */
+.scene-caption {
+  transition: opacity 0.6s var(--ease-expo);
+}

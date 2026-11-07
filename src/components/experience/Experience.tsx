@@ -8,11 +8,11 @@ import { SceneShell } from "./SceneShell";
 import { scenes } from "./scene-data";
 import { SoundEngine, type Sfx } from "./sound-engine";
 import { AmbientPlayer } from "./ambient";
+import { GateGL, type GateGLHandle } from "./GateGL";
+import { SplitWords } from "@/components/motion/SplitWords";
 import { LiveNow } from "./LiveNow";
 import { ScaleZoom } from "./ScaleZoom";
 import { askMotionPermission, buzz, startTilt, stopTilt } from "./tilt";
-import { Starfield } from "./scenes/Starfield";
-import { useCanvasLoop } from "./useCanvasLoop";
 import { MotionToggle } from "@/components/layout/MotionToggle";
 import { ContinueJourney } from "@/components/journey/ContinueJourney";
 import { BeginningScene } from "./scenes/Beginning";
@@ -47,22 +47,14 @@ const HAPTICS: Partial<Record<Sfx, number | number[]>> = {
   roar: [25, 25, 25, 25, 60],
 };
 
-function GateSky() {
-  const stars = useRef(new Starfield(320));
-  const ref = useCanvasLoop((ctx, w, h, t) => {
-    ctx.fillStyle = "#050506";
-    ctx.fillRect(0, 0, w, h);
-    stars.current.draw(ctx, w, h, t, 1, 4);
-  });
-  return <canvas ref={ref} className="gate-sky" aria-hidden="true" />;
-}
-
 export function Experience({ media }: { media: Record<string, ResolvedMedia> }) {
   const engine = useRef<SoundEngine | null>(null);
   const ambient = useRef<AmbientPlayer | null>(null);
   const [hearing, setHearing] = useState<string | null>(null);
   const root = useRef<HTMLDivElement>(null);
   const [entered, setEntered] = useState(false);
+  const [leaving, setLeaving] = useState(false);
+  const gl = useRef<GateGLHandle>(null);
   const [sound, setSound] = useState(true);
   const [reduced, setReduced] = useState(false);
   const [current, setCurrent] = useState<{ id: string; beat: number }>({ id: scenes[0].id, beat: 0 });
@@ -127,12 +119,19 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
     }
     ambient.current.setMuted(!withSound);
     playReal(currentRef.current.id);
-    setEntered(true);
-    const target = scenes.find((s) => `#${s.id}` === window.location.hash);
-    if (target) document.getElementById(target.id)?.scrollIntoView();
-    else window.scrollTo({ top: 0 });
-    const scene = target ?? scenes[0];
-    document.getElementById(scene.id + "-title")?.focus({ preventScroll: true });
+    const open = () => {
+      setEntered(true);
+      const target = scenes.find((s) => `#${s.id}` === window.location.hash);
+      if (target) document.getElementById(target.id)?.scrollIntoView();
+      else window.scrollTo({ top: 0 });
+      const scene = target ?? scenes[0];
+      document.getElementById(scene.id + "-title")?.focus({ preventScroll: true });
+    };
+    if (reduced || entered) return open();
+    // The stars rush past, then the gate lifts.
+    gl.current?.burst();
+    setLeaving(true);
+    window.setTimeout(open, 750);
   };
 
   const onReport = useCallback((id: string, beat: number) => {
@@ -196,12 +195,12 @@ export function Experience({ media }: { media: Record<string, ResolvedMedia> }) 
         <div className="grain" aria-hidden="true" />
         <h1 className="sr-only">THE JOURNEY: 13.8 billion years, from the first light to you</h1>
         {!entered ? (
-          <div className="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title">
-            <GateSky />
+          <div className="gate" role="dialog" aria-modal="true" aria-labelledby="gate-title" data-leaving={leaving || undefined}>
+            <GateGL ref={gl} still={reduced} />
             <div className="gate-inner">
               <p className="gate-eyebrow">An immersive journey through 13.8 billion years</p>
               <p id="gate-title" className="gate-title">
-                THE JOURNEY
+                <SplitWords text="THE JOURNEY" />
               </p>
               <p className="gate-sub">From the first light of the universe to you. Ten worlds to step into, see, touch and hear.</p>
               <div className="gate-buttons">

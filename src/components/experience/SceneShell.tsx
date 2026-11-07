@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { getSource } from "@/data/sources";
 import { Artefacts } from "./Artefacts";
+import { SplitWords } from "@/components/motion/SplitWords";
 import { useExperience } from "./ExperienceContext";
 import type { SceneDef } from "./scene-data";
 
@@ -99,7 +100,7 @@ export function SceneShell({
             Chapter {def.number} <span aria-hidden="true">·</span> {def.beats[beat]?.when ?? def.beats[0].when}
           </p>
           <h2 id={`${def.id}-title`} className="scene-title" tabIndex={-1}>
-            {def.title}
+            <SplitWords text={def.title} />
           </h2>
           <p className="scene-see" data-real={current.real || undefined}>
             <span className="scene-see-dot" aria-hidden="true" />
@@ -123,7 +124,7 @@ export function SceneShell({
         <div className="scene-captions">
           {def.beats.map((b, i) => (
             <p key={i} className="scene-caption" data-on={i === beat || undefined}>
-              {b.text}
+              <SplitWords text={b.text} whole />
             </p>
           ))}
         </div>

@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { getSource } from "@/data/sources";
 import { useCanvasLoop } from "./useCanvasLoop";
+import { SplitWords } from "@/components/motion/SplitWords";
 
 type Thing = { name: string; size: number; text: string; kind: string; sources: string[] };
 
@@ -286,8 +287,8 @@ export function ScaleZoom() {
       />
       <div className="scale-head">
         <p className="scene-eyebrow">Interlude · The size of everything</p>
-        <h2 id="scale-title" className="scene-title">
-          From an atom to the universe
+        <h2 id="scale-title" className="scene-title" data-reveal>
+          <SplitWords text="From an atom to the universe" />
         </h2>
         <p className="scale-hint">Drag sideways or pinch to zoom. Each step on the slider is ten times bigger.</p>
       </div>
