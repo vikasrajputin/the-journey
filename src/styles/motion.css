@@ -244,3 +244,81 @@ html[data-cursor] .cursor-dot {
     display: none;
   }
 }
+
+/* ---------- Bold colours for young explorers ---------- */
+.gate-letters {
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  column-gap: 0.28em;
+}
+.gate-word {
+  display: inline-flex;
+}
+.gate-letter {
+  display: inline-block;
+}
+html[data-js]:not([data-motion]) .gate-letter {
+  animation: letter-pop 0.9s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  animation-delay: calc(0.2s + var(--i) * 70ms);
+}
+@keyframes letter-pop {
+  from {
+    transform: translate3d(0, 60%, 0) scale(0.6) rotate(-8deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.gate-eyebrow {
+  color: #ffe14d;
+}
+.gate-primary {
+  background: #ffcc33;
+  color: #1a1000;
+}
+.gate-primary:hover {
+  background: #ffd84d;
+}
+.gate-secondary {
+  border-color: rgb(255 255 255 / 0.6) !important;
+}
+/* Chapter number as a bright sticker */
+.scene-chip {
+  display: inline-block;
+  margin-right: 0.5rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: var(--chapter-accent);
+  color: #10131b;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+}
+.scene-eyebrow {
+  color: var(--chapter-accent);
+  font-weight: 600;
+}
+/* Numbers in captions pop in the chapter colour */
+.scene-caption .num {
+  color: var(--chapter-accent);
+  font-weight: 700;
+}
+.scene-caption {
+  text-shadow: 0 2px 12px rgb(0 0 0 / 0.85), 0 0 2px #000;
+}
+/* "How do we know?" in the chapter colour */
+.scene-proof {
+  background: var(--chapter-accent);
+  color: #10131b;
+}
+.scene-proof:hover {
+  filter: brightness(1.08);
+}
+.hud-rail a[aria-current] .rail-dot {
+  background: var(--chapter-accent);
+}
+.rail-dot {
+  background: rgb(255 255 255 / 0.55);
+}

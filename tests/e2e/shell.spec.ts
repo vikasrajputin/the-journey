@@ -50,7 +50,7 @@ test("content is visible without JavaScript", async ({ browser }) => {
   const page = await context.newPage();
   await page.goto("/");
   await expect(page.getByRole("heading", { name: "Before Everything" })).toBeVisible();
-  await expect(page.locator(".scene-caption", { hasText: "13.8 billion years ago, everything we can see" })).toBeVisible();
+  await expect(page.locator(".scene-caption", { hasText: "13.8 billion years ago, everything you can see" })).toBeVisible();
   await expect(page.getByRole("link", { name: "ten chapters", exact: true })).toBeVisible();
   await context.close();
 });
@@ -97,7 +97,7 @@ test("each scene labels what is real and opens its proof", async ({ page }) => {
   await page.getByRole("button", { name: "Enter in silence" }).click();
   const scene = page.locator("#beginning");
   await expect(scene.locator(".scene-see")).toContainText("Simulation");
-  await scene.getByRole("button", { name: /See the proof/ }).click();
+  await scene.getByRole("button", { name: /How do we know/ }).click();
   const proof = page.getByRole("dialog", { name: "Before Everything" });
   await expect(proof).toBeVisible();
   await expect(proof.getByRole("link", { name: "WMAP Overview" })).toHaveAttribute("href", /nasa\.gov/);
