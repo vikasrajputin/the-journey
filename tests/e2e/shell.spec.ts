@@ -4,7 +4,7 @@ import AxeBuilder from "@axe-core/playwright";
 const isRemoteMediaFailure = (msg: { text(): string; location(): { url: string } }) =>
   msg.text().startsWith("Failed to load resource") && /wikimedia\.org/.test(msg.location().url);
 
-const routes = ["/", "/journey", "/journey/before-everything", "/journey/you", "/timeline", "/evidence", "/sources", "/about", "/glossary", "/search"];
+const routes = ["/", "/sources", "/about"];
 
 for (const route of routes) {
   test(`${route} loads without console errors or accessibility violations`, async ({ page }) => {
@@ -24,6 +24,8 @@ for (const route of routes) {
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
 
+    // Let the title's entrance animation finish so text is at full contrast.
+    if (route === "/") await page.waitForTimeout(1600);
     const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21aa", "wcag22aa"]).analyze();
     expect(results.violations.map((v) => `${v.id}: ${v.nodes.length}`)).toEqual([]);
     expect(errors).toEqual([]);
@@ -31,7 +33,7 @@ for (const route of routes) {
 }
 
 test("unknown routes show the custom 404", async ({ page }) => {
-  const response = await page.goto("/journey/not-a-chapter");
+  const response = await page.goto("/journey/before-everything");
   expect(response?.status()).toBe(404);
   await expect(page.getByRole("heading", { name: "This part of the map is empty" })).toBeVisible();
 });
@@ -45,13 +47,12 @@ test("skip link moves focus to the main content", async ({ page }) => {
   await expect(page).toHaveURL(/#main$/);
 });
 
-test("content is visible without JavaScript", async ({ browser }) => {
+test("the chapter is readable without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.getByRole("heading", { name: "Before Everything" })).toBeVisible();
-  await expect(page.locator(".scene-caption", { hasText: "13.8 billion years ago, everything you can see" })).toBeVisible();
-  await expect(page.getByRole("link", { name: "ten chapters", exact: true })).toBeVisible();
+  await expect(page.getByText("Level 1: The Big Bang")).toBeVisible();
+  await expect(page.getByRole("link", { name: "See the sources" })).toBeVisible();
   await context.close();
 });
 
@@ -73,13 +74,13 @@ test("mobile menu opens, navigates and closes with Escape", async ({ page, isMob
   await page.keyboard.press("Escape");
   await expect(dialog).toBeHidden();
   await page.getByRole("button", { name: "Menu" }).click();
-  await dialog.getByRole("link", { name: /The Age of Giants/ }).click();
-  await expect(page).toHaveURL(/\/journey\/age-of-giants$/);
+  await dialog.getByRole("link", { name: "Sources" }).click();
+  await expect(page).toHaveURL(/\/sources$/);
   await expect(dialog).toBeHidden();
 });
 
 test("no page scrolls sideways from phone to wide desktop", async ({ browser }) => {
-  const pages = ["/", "/timeline", "/evidence", "/sources", "/journey/civilisation", "/search?q=moon"];
+  const pages = ["/", "/sources", "/about"];
   for (const width of [360, 768, 1024, 1920]) {
     const context = await browser.newContext({ viewport: { width, height: 900 } });
     const page = await context.newPage();
@@ -90,17 +91,4 @@ test("no page scrolls sideways from phone to wide desktop", async ({ browser }) 
     }
     await context.close();
   }
-});
-
-test("each scene labels what is real and opens its proof", async ({ page }) => {
-  await page.goto("/");
-  await page.getByRole("button", { name: "Enter in silence" }).click();
-  const scene = page.locator("#beginning");
-  await expect(scene.locator(".scene-see")).toContainText("Simulation");
-  await scene.getByRole("button", { name: /How do we know/ }).click();
-  const proof = page.getByRole("dialog", { name: "Before Everything" });
-  await expect(proof).toBeVisible();
-  await expect(proof.getByRole("link", { name: "WMAP Overview" })).toHaveAttribute("href", /nasa\.gov/);
-  await proof.getByRole("button", { name: "Close" }).click();
-  await expect(proof).toBeHidden();
 });

@@ -1,8 +1,8 @@
 # THE JOURNEY
 
-**The story of everything, and then there was you.** An immersive educational website and digital museum that tells 13.8 billion years of cosmic, geological, evolutionary and human history in ten chapters, built on cited evidence and ending with the visitor.
+**The story of everything, and then there was you.** An educational game for school students (about ages 9 to 16) that teaches the history of the universe and of humankind, one level at a time.
 
-No accounts, no trackers, no database, no game mechanics. Every chapter is readable without JavaScript.
+Right now the site is **Chapter 1: Before Everything**, a 3D game in seven levels. More chapters will be added the same way.
 
 ## Running it
 
@@ -13,56 +13,55 @@ npm install
 npm run dev          # http://localhost:3000
 npm run build        # static production build
 npm start            # serve the build
+npm run build:pages  # static export for GitHub Pages (out/)
 ```
-
-Copy `.env.example` to `.env.local` and set `NEXT_PUBLIC_SITE_URL` to the public origin before deploying. It is the only setting.
 
 ## Checks
 
 ```bash
-npm run check        # lint + typecheck + unit tests (Vitest)
+npm run check                       # lint + typecheck + unit tests (Vitest)
 npm run build && npm run test:e2e   # browser tests (Playwright, desktop and mobile, with axe)
 ```
 
-`npm run build` also validates all content (`assertContentValid()`): unknown sources, glossary terms or exhibits, missing text alternatives and placeholder text fail the build.
+## Chapter 1, the game
 
-## What is where
+| Level | What happens | What you do |
+| --- | --- | --- |
+| 1. The Big Bang | A tiny hot speck bursts and space starts to stretch | Press and hold |
+| 2. Space Stretches | Galaxies drift apart and their light turns red (redshift) | Drag to stretch space |
+| 3. The First Building Blocks | Protons and neutrons fuse into helium in the first minutes | Tap the glowing groups |
+| 4. The Fog Clears | At 380,000 years atoms form and light breaks free (the CMB) | Swipe away the fog |
+| 5. The First Stars | Gravity squeezes gas clouds until they light up | Hold a cloud |
+| 6. Star Factory | Stars cook hydrogen up to iron, then explode as a supernova | Tap to squeeze the star |
+| 7. Galaxy Builder | Small galaxies merge into a big spiral | Drag (or tap) star groups to the middle |
+
+Each level ends with a "level complete" card: up to three stars (finish, speed, quiz), one short fact and a one-question quiz. Longer explanations and the sources sit in a **Learn more** panel, so the main screen has no paragraphs. Levels unlock in order and any level can be skipped. Progress is saved in the browser only.
+
+### Where things are
 
 | Path | Purpose |
 | --- | --- |
-| `src/content/chapters/` | The ten chapters as typed data: sections, blocks, evidence, "go deeper" |
-| `src/content/exhibits/` | Exhibit definitions with full text alternatives |
-| `src/content/glossary/`, `src/content/methods/` | Glossary terms and the "How do we know?" methods |
-| `src/data/sources.ts` | Source registry: every citation, with what it supports and whether it was checked |
-| `src/data/timeline.ts`, `src/data/geologic-periods.ts` | Timeline events and period boundaries |
-| `src/components/exhibits/visuals/` | SVG and HTML visuals (maps, charts, diagrams), drawn from each exhibit's text |
-| `src/components/timeline/` | The interactive timeline |
-| `src/lib/` | Content schema, validation, inline markup, timeline scale, search |
-| `tests/unit`, `tests/e2e` | Vitest and Playwright suites |
+| `src/components/game/levels.ts` | Every word the player reads: goals, facts, quiz, "Learn more" text, sources |
+| `src/components/game/levels/*.tsx` | One React Three Fiber scene per level |
+| `src/components/game/Game.tsx` | Screens (title, level map, warp, play, level complete, chapter complete) and HUD |
+| `src/components/game/Stage.tsx` | The single WebGL canvas, title and warp scenes, bloom |
+| `src/components/game/DetailsPanel.tsx` | The "Learn more" panel |
+| `src/components/game/FlatScene.tsx` | Simple 2D mode for devices without WebGL |
+| `src/components/game/sound-engine.ts` | Sound effects and space ambience, synthesised live with Web Audio (no audio files) |
+| `src/data/sources.ts` | Source registry; a unit test checks every level's sources exist |
+| `src/styles/game.css` | Game UI styles |
 
-Content is separate from presentation: editors change files in `src/content` and `src/data`, never components. See [CONTENT_GUIDE.md](CONTENT_GUIDE.md).
+### Stack
 
-## Pages
+Next.js 15 (static), React 19, TypeScript, Tailwind 4, **React Three Fiber + drei** for 3D, **@react-three/postprocessing** for bloom, **GSAP** for screen and card animation, Lenis for smooth scrolling on the text pages.
 
-`/` opening · `/journey` and `/journey/[chapter]` the ten chapters · `/timeline` interactive timeline with text list · `/evidence` how we know · `/sources` source directory · `/glossary` · `/search` · `/about`
+### Phones and slow devices
 
-## Stack
+- Phones, tablets and weaker machines start in **Lite** graphics: canvas DPR at most 1.25, no post-processing, about 40% of the particles. Desktops get **Full**. Players can switch on the title screen, and the game drops to Lite by itself if the frame rate falls (drei `PerformanceMonitor`).
+- Without WebGL the game runs in a simple 2D mode with the same goals, quiz, stars and "Learn more".
+- Without JavaScript the page shows a plain list of the seven levels and their facts.
+- Every level can be played with the keyboard (press or hold Space) and skipped. Reduced-motion turns off flashes and screen shake.
 
-Next.js 15 (App Router, fully static), React 19, TypeScript, Tailwind CSS 4, next/font. Maps are rendered at build time from Natural Earth outlines (`world-atlas`, `d3-geo`); there are no map tiles or other runtime requests to third parties.
+## Rules for content
 
-## Further reading
-
-- [CONTENT_GUIDE.md](CONTENT_GUIDE.md): writing and editing content
-- [SOURCES.md](SOURCES.md): sourcing policy, verification status and open editorial items
-- [ACCESSIBILITY.md](ACCESSIBILITY.md): accessibility approach, testing and known limitations
-
-## The immersive journey (home page)
-
-The home page is a full-screen, scroll-driven experience: ten scenes, one per chapter, under `src/components/experience/`.
-
-- **Scenes** (`scenes/*.tsx`) draw on canvas and react to scroll, taps, drags and holds. Each scene is a tall section with a sticky stage, so the page scrolls normally and is never hijacked.
-- **Words** live in `scene-data.ts`: short on-screen captions (no spoken narration). Every claim comes from the chapter text, which carries the sources.
-- **Sound** (`sound-engine.ts`) is synthesised live with the Web Audio API: there are no audio files. The dinosaur call is a labelled reconstruction. Sound starts only after the visitor taps "Enter with sound".
-- **Photos and films** (`src/lib/media.ts`) are real files on Wikimedia Commons (NASA, ESA, NOAA and others), loaded straight from Wikimedia, with credits in each scene and at the end. If a file can't load, the scene's own artwork shows instead.
-- Motion respects `prefers-reduced-motion` and the site's "Reduce motion" toggle. Without JavaScript the home page shows the scene titles and first captions, and links to the chapters.
-- **Proof**: every caption carries `sources` (ids in `src/data/sources.ts`) and a `see` label saying whether the visitor is looking at a real photo, film, fossil or data, or at a simulation. The label shows on screen, and "See the proof" opens each scene's claims with their references. A unit test fails if any caption has no registered source.
+Science only. Every fact must come from a source in `src/data/sources.ts` (NASA, ESA, museums, universities, peer-reviewed papers). The 3D scenes are simulations made for the game and the "Learn more" panel says so. Use very simple words: short sentences, explain hard words. See [CONTENT_GUIDE.md](CONTENT_GUIDE.md) and [SOURCES.md](SOURCES.md).

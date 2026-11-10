@@ -29,10 +29,10 @@ export function SiteHeader() {
         <div className="hidden lg:flex items-center gap-3">
           <MotionToggle />
           <Link
-            href="/journey/before-everything"
+            href="/"
             className="inline-flex min-h-11 items-center rounded-full border border-accent/60 px-5 text-sm font-medium text-accent hover:bg-accent hover:text-night transition-colors"
           >
-            Begin
+            Play
           </Link>
         </div>
 

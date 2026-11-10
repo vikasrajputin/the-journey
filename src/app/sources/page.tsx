@@ -1,25 +1,22 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { PageIntro } from "@/components/layout/PageIntro";
 import { SourceLine } from "@/components/content/SourceCitation";
 import { SourceFilter } from "@/components/content/SourceFilter";
 import { sources } from "@/data/sources";
-import { allChapters } from "@/content/chapters";
-import { chapterSourceIds } from "@/lib/chapter-refs";
+import { levels } from "@/components/game/levels";
 import type { Source } from "@/lib/content-schema";
 
 export const metadata: Metadata = {
   title: "Sources",
-  description: "The references behind THE JOURNEY, grouped by chapter: research, museum, university and government sources, each checked against the claim it supports.",
+  description: "The science behind the Chapter 1 game, level by level: research, museum, university and government sources, each checked against the claim it supports.",
   alternates: { canonical: "/sources" },
 };
 
 const byId = new Map(sources.map((s) => [s.id, s]));
-const groups = allChapters.map((c) => ({
-  id: `chapter-${c.slug}`,
-  title: `Chapter ${c.number}: ${c.title}`,
-  href: `/journey/${c.slug}`,
-  list: chapterSourceIds(c)
+const groups = levels.map((l) => ({
+  id: `level-${l.id}`,
+  title: `Level ${l.number}: ${l.name}`,
+  list: l.sourceIds
     .map((id) => byId.get(id))
     .filter((s): s is Source => Boolean(s)),
 }));
@@ -42,8 +39,8 @@ export default function SourcesPage() {
     <>
       <PageIntro eyebrow="Sources" title="Where the story comes from">
         <p>
-          The references behind the exhibition, grouped by chapter. Every source was found on its publisher&rsquo;s own
-          site; {checked} of {sources.length} have been re-read against the exact claim they support.
+          Every fact in the Chapter 1 game comes from here, level by level. Every source was found on its
+          publisher&rsquo;s own site; {checked} of {sources.length} have been re-read against the exact claim they support.
         </p>
       </PageIntro>
 
@@ -56,8 +53,7 @@ export default function SourcesPage() {
           </p>
           <p>
             Entries marked &ldquo;claim-by-claim check pending&rdquo; are on publisher sites that could not be read
-            automatically; a person still needs to confirm them. Read more about{" "}
-            <Link href="/evidence#reading-evidence" className="link-quiet text-accent">how evidence is labelled</Link>.
+            automatically; a person still needs to confirm them.
           </p>
         </div>
 
@@ -77,7 +73,7 @@ export default function SourcesPage() {
             {other.length ? (
               <li>
                 <a href="#other-sources" className="inline-flex min-h-10 items-center rounded-full border border-border-dark px-3 text-muted hover:border-accent hover:text-text-light">
-                  Methods and timeline
+                  Background
                 </a>
               </li>
             ) : null}
@@ -87,7 +83,7 @@ export default function SourcesPage() {
         {groups.map((g) => (
           <section key={g.id} id={g.id} data-source-group aria-labelledby={`${g.id}-title`} className="scroll-mt-28 pt-14">
             <h2 id={`${g.id}-title`} className="font-display text-[length:var(--text-h3)] text-text-light">
-              <Link href={g.href} className="link-quiet">{g.title}</Link>
+              {g.title}
             </h2>
             <p className="mt-1 text-sm text-muted">{g.list.length} sources</p>
             <ul className="mt-5 grid gap-px overflow-hidden rounded-xl border border-border-dark bg-border-dark md:grid-cols-2">
@@ -101,9 +97,9 @@ export default function SourcesPage() {
         {other.length ? (
           <section id="other-sources" data-source-group aria-labelledby="other-sources-title" className="scroll-mt-28 pt-14">
             <h2 id="other-sources-title" className="font-display text-[length:var(--text-h3)] text-text-light">
-              Methods, timeline and background
+              Background reading
             </h2>
-            <p className="mt-1 text-sm text-muted">Used on the timeline and the &ldquo;How do we know?&rdquo; page, or as background reading.</p>
+            <p className="mt-1 text-sm text-muted">Extra reading for curious players.</p>
             <ul className="mt-5 grid gap-px overflow-hidden rounded-xl border border-border-dark bg-border-dark md:grid-cols-2">
               {other.map((s) => (
                 <Entry key={s.id} source={s} />

@@ -2,6 +2,8 @@
 
 THE JOURNEY makes claims about 13.8 billion years of history. Every claim has to be traceable to evidence a reader can check.
 
+Since the Chapter 1 game rebuild, the registry holds only the sources used by the game's seven levels. Each level lists its `sourceIds` in `src/components/game/levels.ts`, shown in its "Learn more" panel and on `/sources`. Sources for later chapters will come back with those chapters.
+
 ## Policy
 
 - **Preferred sources:** peer-reviewed research, museums, universities, public scientific agencies, UNESCO, and established reference works. Popular articles are used only as plain-language companions to primary work.
