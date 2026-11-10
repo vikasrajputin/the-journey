@@ -1,9 +1,8 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { chapters, primaryNav } from "@/data/navigation";
+import { primaryNav } from "@/data/navigation";
 import { MotionToggle } from "./MotionToggle";
 import { NavLink } from "./NavLink";
 
@@ -61,11 +60,6 @@ export function MobileNavigation() {
         <div className="flex-1 overflow-y-auto px-[var(--gutter)] py-6">
           <nav aria-label="Primary">
             <ul className="grid gap-1">
-              <li>
-                <NavLink href="/" onNavigate={close} className="flex min-h-12 items-center text-lg">
-                  Home
-                </NavLink>
-              </li>
               {primaryNav.map((item) => (
                 <li key={item.href}>
                   <NavLink href={item.href} onNavigate={close} className="flex min-h-12 items-center text-lg aria-[current=page]:text-accent">
@@ -73,29 +67,8 @@ export function MobileNavigation() {
                   </NavLink>
                 </li>
               ))}
-              <li>
-                <NavLink href="/about" onNavigate={close} className="flex min-h-12 items-center text-lg aria-[current=page]:text-accent">
-                  About
-                </NavLink>
-              </li>
             </ul>
           </nav>
-
-          <h2 className="eyebrow mt-8 mb-3 text-muted">The ten chapters</h2>
-          <ol className="grid gap-1">
-            {chapters.map((c) => (
-              <li key={c.id}>
-                <Link
-                  href={`/journey/${c.slug}`}
-                  onClick={close}
-                  className="flex min-h-12 items-baseline gap-3 border-b border-border-dark py-2"
-                >
-                  <span className="w-6 shrink-0 text-sm tabular-nums text-accent">{String(c.number).padStart(2, "0")}</span>
-                  <span className="font-display text-xl">{c.title}</span>
-                </Link>
-              </li>
-            ))}
-          </ol>
 
           <div className="mt-8">
             <MotionToggle className="-ml-3" />

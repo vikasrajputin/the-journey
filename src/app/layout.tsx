@@ -8,7 +8,7 @@ import { Cursor } from "@/components/motion/Cursor";
 import { PageTransition } from "@/components/motion/PageTransition";
 import { Parallax } from "@/components/motion/Parallax";
 import "@/styles/motion.css";
-import "@/styles/showcase.css";
+import "@/styles/game.css";
 import { siteConfig } from "@/lib/site";
 import "./globals.css";
 

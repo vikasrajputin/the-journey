@@ -2,6 +2,17 @@
 
 Target: **WCAG 2.2 level AA**. The exhibition is for everyone, including people who use a keyboard, a screen reader, magnification or reduced motion, or who have JavaScript turned off.
 
+## The Chapter 1 game
+
+- Every level can be played with the keyboard: press or hold **Space** (or Enter). Every level has a **Skip** button, so nobody gets stuck.
+- The HUD goal and progress bar are real text and a `progressbar` with live updates; the 3D canvas is decorative (`aria-hidden`).
+- "Learn more" is a native modal `<dialog>` with a Close button and Escape support.
+- Reduced motion (system setting or the site toggle) removes the Big Bang flash, screen shake and screen entrance animations.
+- Buttons are at least 44px tall; colours on the game UI are bold with dark text on bright fills.
+- Without WebGL a flat 2D mode is used; without JavaScript the page lists the seven levels and facts as plain text.
+
+Notes below about chapters, timeline and glossary pages describe the earlier text site and apply to `/sources` and `/about` only.
+
 ## What the site does
 
 **Structure and navigation**
