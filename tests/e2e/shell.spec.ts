@@ -51,7 +51,7 @@ test("the chapter is readable without JavaScript", async ({ browser }) => {
   const context = await browser.newContext({ javaScriptEnabled: false });
   const page = await context.newPage();
   await page.goto("/");
-  await expect(page.getByText("Level 1: The Big Bang")).toBeVisible();
+  await expect(page.getByRole("region", { name: "Chapter 1 without JavaScript" }).getByText("The Big Bang", { exact: true })).toBeVisible();
   await expect(page.getByRole("link", { name: "See the sources" })).toBeVisible();
   await context.close();
 });

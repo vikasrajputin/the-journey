@@ -64,3 +64,9 @@ export function pointCloud(n: number, place: (i: number, p: THREE.Vector3, c: TH
 }
 
 export const damp = THREE.MathUtils.damp;
+
+/**
+ * Screen shake asked for by a level (a bang, a supernova). The camera rig adds it
+ * on top of its own gentle sway, so levels never fight over the camera.
+ */
+export const shake = { x: 0, y: 0 };

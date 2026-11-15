@@ -4,51 +4,47 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import gsap from "gsap";
-import { CHAPTER, levels, type Level } from "./levels";
+import { CHAPTER, moments } from "./moments";
 import { detectQuality, hasWebGL, type Quality } from "./quality";
-import { loadPref, loadProgress, savePref, saveProgress, type Progress } from "./progress";
-import type { SceneStatus } from "./shared";
+import { loadPref, savePref } from "./progress";
 import type { SoundEngine, Sfx } from "./sound-engine";
-import type { StageMode } from "./Stage";
-import { FlatScene } from "./FlatScene";
 import { DetailsPanel } from "./DetailsPanel";
 
 const Stage = dynamic(() => import("./Stage"), { ssr: false });
 
-type Screen = "title" | "map" | "warp" | "play" | "won" | "end";
-type RunStars = { finish: boolean; speed: boolean; quiz: boolean | null; seconds: number };
-
-const unlocked = (p: Progress, i: number) => i === 0 || p[levels[i - 1].id] !== undefined;
-const starsOf = (r: RunStars) => Number(r.finish) + Number(r.speed) + Number(r.quiz === true);
-
+/**
+ * Chapter 1 as one immersive journey. No levels, scores or menus to manage:
+ * press Begin and drift through the first billion years of the universe.
+ * Seven moments unfold around you; a short line tells you what you are
+ * seeing, and "Learn more" opens the details and the sources.
+ */
 export function Game() {
-  const [screen, setScreen] = useState<Screen>("title");
-  const [index, setIndex] = useState(0);
-  const [attempt, setAttempt] = useState(0);
-  const [progress, setProgress] = useState<Progress>({});
+  const [started, setStarted] = useState(false);
+  const [ready, setReady] = useState(false);
   const [quality, setQuality] = useState<Quality>("low");
   const [webgl, setWebgl] = useState<boolean | null>(null);
   const [still, setStill] = useState(false);
   const [muted, setMuted] = useState(false);
-  const [status, setStatus] = useState<SceneStatus | null>(null);
-  const [run, setRun] = useState<RunStars | null>(null);
-  const [answer, setAnswer] = useState<number | null>(null);
+  const [moment, setMoment] = useState(-1);
+  const [ended, setEnded] = useState(false);
+  const [drifting, setDrifting] = useState(true);
+  const [jump, setJump] = useState({ index: 0, n: 0 });
   const [details, setDetails] = useState(false);
+  const [touch, setTouch] = useState(false);
 
-  const level = levels[index];
   const sound = useRef<SoundEngine | null>(null);
-  const bar = useRef<HTMLDivElement>(null);
-  const barValue = useRef<HTMLDivElement>(null);
-  const started = useRef(0);
+  const motion = useRef(0);
+  const fill = useRef<HTMLDivElement>(null);
   const root = useRef<HTMLDivElement>(null);
+  const shown = moments[Math.max(0, moment)];
 
   // Read device and saved settings once we are in the browser.
   useEffect(() => {
-    setProgress(loadProgress());
     setWebgl(hasWebGL());
     const q = loadPref("graphics");
     setQuality(q === "high" || q === "low" ? q : detectQuality());
     setMuted(loadPref("muted") === "1");
+    setTouch(window.matchMedia("(pointer: coarse)").matches);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => setStill(mq.matches || document.documentElement.hasAttribute("data-motion"));
     sync();
@@ -83,369 +79,242 @@ export function Game() {
     void ensureSound().then((s) => s?.setMuted(m));
   };
 
-  /* ---------------- level flow ---------------- */
-  const go = useCallback(
-    (i: number) => {
-      void ensureSound().then((s) => s?.play(levels[i].id === "forge" ? "forge" : "cosmos"));
-      sfx("whoosh");
-      setIndex(i);
-      setAttempt((a) => a + 1);
-      setRun(null);
-      setAnswer(null);
-      setStatus(null);
-      setScreen("warp");
-    },
-    [ensureSound, sfx],
-  );
-
+  // The rush of air follows how fast you travel.
   useEffect(() => {
-    if (screen !== "warp") return;
-    const t = window.setTimeout(() => {
-      started.current = performance.now();
-      setScreen("play");
-    }, still ? 900 : 2200);
-    return () => window.clearTimeout(t);
-  }, [screen, still]);
+    if (!started) return;
+    const t = window.setInterval(() => sound.current?.setRush(motion.current), 100);
+    return () => {
+      window.clearInterval(t);
+      sound.current?.setRush(0);
+    };
+  }, [started]);
 
-  const onProgress = useCallback((p: number) => {
-    const v = Math.max(0, Math.min(1, p));
-    if (bar.current) bar.current.style.transform = `scaleX(${v})`;
-    const pct = Math.round(v * 100);
-    if (barValue.current && barValue.current.getAttribute("aria-valuenow") !== String(pct)) {
-      barValue.current.setAttribute("aria-valuenow", String(pct));
-    }
+  /* ---------------- journey ---------------- */
+  const begin = () => {
+    void ensureSound().then((s) => s?.play("garden"));
+    sfx("whoosh");
+    setStarted(true);
+  };
+  const goTo = (i: number) => setJump((j) => ({ index: i, n: j.n + 1 }));
+  const again = () => {
+    setEnded(false);
+    goTo(-1);
+  };
+  const onMoment = useCallback((i: number) => setMoment(i), []);
+  const onEnd = useCallback((e: boolean) => setEnded(e), []);
+  const onProgress = useCallback((t: number) => {
+    if (fill.current) fill.current.style.transform = `scaleY(${t})`;
   }, []);
-
-  const onWin = useCallback(() => {
-    const seconds = (performance.now() - started.current) / 1000;
-    const r: RunStars = { finish: true, speed: seconds <= levels[index].par, quiz: null, seconds };
-    setRun(r);
-    setScreen("won");
-    sfx("chime");
-    setProgress((p) => {
-      const next = { ...p, [levels[index].id]: Math.max(p[levels[index].id] ?? 0, starsOf(r)) };
-      saveProgress(next);
-      return next;
-    });
-  }, [index, sfx]);
-
-  const choose = (i: number) => {
-    if (answer !== null || !run) return;
-    setAnswer(i);
-    const right = i === level.quiz.correct;
-    sfx(right ? "chime" : "divide");
-    const r = { ...run, quiz: right };
-    setRun(r);
-    setProgress((p) => {
-      const next = { ...p, [level.id]: Math.max(p[level.id] ?? 0, starsOf(r)) };
-      saveProgress(next);
-      return next;
-    });
-  };
-
-  const next = () => (index + 1 < levels.length ? go(index + 1) : setScreen("end"));
-  const skip = () => {
-    setProgress((p) => {
-      const nextP = { ...p, [level.id]: p[level.id] ?? 0 };
-      saveProgress(nextP);
-      return nextP;
-    });
-    next();
-  };
-  const play = () => {
-    const first = levels.findIndex((_, i) => unlocked(progress, i) && progress[levels[i].id] === undefined);
-    go(first === -1 ? 0 : first);
-  };
-
+  const onReady = useCallback(() => setReady(true), []);
+  const onSlow = useCallback(() => setQuality("low"), []);
   const setGraphics = (q: Quality) => {
     setQuality(q);
     savePref("graphics", q);
   };
-  const onSlow = useCallback(() => setQuality("low"), []);
 
-  /* ---------------- keyboard play ---------------- */
+  // Show the Begin button even if the 3D world is slow to start.
   useEffect(() => {
-    if (screen !== "play") return;
-    const isAction = (e: KeyboardEvent) => (e.key === " " || e.key === "Enter") && !(e.target as Element)?.closest?.("button, a, dialog");
-    const down = (e: KeyboardEvent) => {
-      if (!isAction(e) || e.repeat) return;
-      e.preventDefault();
-      window.dispatchEvent(new Event("game:press"));
-    };
-    const up = (e: KeyboardEvent) => {
-      if (!isAction(e)) return;
-      e.preventDefault();
-      window.dispatchEvent(new Event("game:release"));
-    };
-    window.addEventListener("keydown", down);
-    window.addEventListener("keyup", up);
-    return () => {
-      window.removeEventListener("keydown", down);
-      window.removeEventListener("keyup", up);
-    };
-  }, [screen]);
+    if (webgl === false) setReady(true);
+    const t = window.setTimeout(() => setReady(true), 3000);
+    return () => window.clearTimeout(t);
+  }, [webgl]);
 
-  /* ---------------- motion for the screens ---------------- */
+  /* ---------------- motion for the words ---------------- */
   useLayoutEffect(() => {
     const el = root.current;
     if (!el || still) return;
     const ctx = gsap.context(() => {
-      if (screen === "title") {
-        gsap.from(".title-word", { y: 60, opacity: 0, duration: 0.9, stagger: 0.12, ease: "back.out(1.6)" });
-        gsap.from(".title-actions > *", { y: 20, opacity: 0, duration: 0.5, delay: 0.5, stagger: 0.08 });
+      if (!started) {
+        gsap.from(".title-word", { y: 50, opacity: 0, duration: 1.1, stagger: 0.14, ease: "power3.out" });
+        gsap.from(".title-actions > *", { y: 16, opacity: 0, duration: 0.7, delay: 0.6, stagger: 0.08 });
       }
-      if (screen === "warp") {
-        gsap.fromTo(".warp-card", { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(2)" });
-        gsap.to(".warp-card", { scale: 1.6, opacity: 0, duration: 0.5, delay: 1.6, ease: "power2.in" });
+      if (started && moment >= 0 && !ended) {
+        gsap.from(".cap-line", { y: 24, opacity: 0, duration: 1.2, stagger: 0.35, ease: "power3.out", delay: 0.3 });
       }
-      if (screen === "won" || screen === "end") {
-        gsap.from(".card", { y: 50, opacity: 0, duration: 0.55, ease: "back.out(1.4)" });
-        gsap.from(".star-badge", { scale: 0, rotate: -90, duration: 0.5, delay: 0.3, stagger: 0.15, ease: "back.out(3)" });
-      }
-      if (screen === "map") gsap.from(".map-node", { y: 30, opacity: 0, duration: 0.45, stagger: 0.06, ease: "back.out(1.6)" });
+      if (ended) gsap.from(".end-line", { y: 24, opacity: 0, duration: 1.1, stagger: 0.3, ease: "power3.out" });
     }, el);
     return () => ctx.revert();
-  }, [screen, still]);
-
-  const mode: StageMode =
-    screen === "title" || screen === "map" || screen === "end"
-      ? { kind: "title" }
-      : screen === "warp"
-        ? { kind: "warp", color: level.color }
-        : { kind: "level", id: level.id, attempt };
-
-  const total = levels.reduce((n, l) => n + (progress[l.id] ?? 0), 0);
+  }, [started, moment, ended, still]);
 
   return (
-    <div ref={root} className="game" style={{ "--lvl": level.color } as React.CSSProperties} data-screen={screen}>
+    <div
+      ref={root}
+      className="game journey"
+      style={{ "--lvl": shown.color } as React.CSSProperties}
+      data-screen={started ? (ended ? "end" : "journey") : "title"}
+      data-ready={ready ? "" : undefined}
+      data-quality={quality}
+    >
       {webgl ? (
         <Stage
-          mode={screen === "won" ? { kind: "level", id: level.id, attempt } : mode}
           quality={quality}
           onSlow={onSlow}
-          onProgress={onProgress}
-          onWin={onWin}
-          onStatus={setStatus}
-          sfx={sfx}
+          onReady={onReady}
           still={still}
+          playing={started}
+          drifting={drifting && !details}
+          jump={jump}
+          count={moments.length}
+          sfx={sfx}
+          onMoment={onMoment}
+          onProgress={onProgress}
+          onEnd={onEnd}
+          motion={motion}
         />
       ) : null}
 
-      <h1 className={screen === "title" ? "title" : "sr-only"}>
+      <h1 className={started ? "sr-only" : "title"}>
         <span className="title-word">THE</span> <span className="title-word">JOURNEY</span>
         <span className="sr-only">, Chapter 1: Before Everything</span>
       </h1>
 
       {/* ---------------- title ---------------- */}
-      {screen === "title" ? (
+      {!started ? (
         <div className="screen title-screen">
           <p className="title-chapter title-word">
             Chapter 1 · <strong>{CHAPTER.title}</strong>
           </p>
           <p className="title-tag title-word">{CHAPTER.tagline}</p>
+          <div className="title-load" aria-hidden={ready ? true : undefined}>
+            <div className="load-bar" role="progressbar" aria-label="Building the universe" aria-valuetext={ready ? "Ready" : "Loading"}>
+              <span />
+            </div>
+            <p className="load-text">Building the universe…</p>
+          </div>
           <div className="title-actions">
-            <button type="button" className="btn btn-big" onClick={play}>
-              <PlayIcon /> {total > 0 ? "Keep playing" : "Play"}
-            </button>
-            <button type="button" className="btn btn-ghost" onClick={() => setScreen("map")}>
-              Pick a level
+            <button type="button" className="btn btn-big" onClick={begin}>
+              <PlayIcon /> Begin the journey
             </button>
           </div>
           <Settings quality={quality} setGraphics={setGraphics} muted={muted} toggleMute={toggleMute} webgl={webgl} />
         </div>
       ) : null}
 
-      {/* ---------------- level map ---------------- */}
-      {screen === "map" ? (
-        <div className="screen map-screen">
-          <div className="map-head">
-            <button type="button" className="btn btn-ghost btn-sm" onClick={() => setScreen("title")}>
-              ← Back
-            </button>
-            <h2 className="map-title">Chapter 1: {CHAPTER.title}</h2>
-            <p className="map-stars" aria-label={`${total} of ${levels.length * 3} stars`}>
-              <StarIcon on /> {total} / {levels.length * 3}
-            </p>
-          </div>
-          <ol className="map-path">
-            {levels.map((l, i) => {
-              const open = unlocked(progress, i);
-              const got = progress[l.id];
-              return (
-                <li key={l.id} className="map-node" style={{ "--c": l.color } as React.CSSProperties}>
-                  <button type="button" className="map-btn" disabled={!open} onClick={() => go(i)}>
-                    <span className="map-orb" aria-hidden="true">
-                      {open ? l.number : <LockIcon />}
-                    </span>
-                    <span className="map-text">
-                      <span className="map-name">{l.name}</span>
-                      <span className="map-when">{l.when}</span>
-                      <span className="map-got" aria-label={open ? `${got ?? 0} of 3 stars` : "Locked: finish the level before"}>
-                        {open ? [0, 1, 2].map((k) => <StarIcon key={k} on={(got ?? 0) > k} />) : "Locked"}
-                      </span>
-                    </span>
-                  </button>
-                </li>
-              );
-            })}
-          </ol>
-        </div>
-      ) : null}
-
-      {/* ---------------- warp ---------------- */}
-      {screen === "warp" ? (
-        <div className="screen warp-screen" role="status">
-          <div className="warp-card">
-            <p className="warp-level">Level {level.number}</p>
-            <p className="warp-name">{level.name}</p>
-            <p className="warp-when">{level.when}</p>
-          </div>
-        </div>
-      ) : null}
-
-      {/* ---------------- playing ---------------- */}
-      {screen === "play" || screen === "won" ? (
-        <div className="hud" aria-hidden={screen === "won" ? true : undefined}>
+      {/* ---------------- the journey ---------------- */}
+      {started && webgl ? (
+        <div className="hud journey-hud">
           <div className="hud-top">
-            <div className="hud-level">
-              <span className="hud-num">Level {level.number}/{levels.length}</span>
-              <span className="hud-name">{level.name}</span>
-              <span className="hud-when">{level.when}</span>
-            </div>
+            <p className="j-brand">
+              THE JOURNEY <span>· Chapter 1</span>
+            </p>
             <div className="hud-buttons">
-              <button type="button" className="icon-btn" onClick={() => setDetails(true)} aria-label="Learn more about this level">
-                <BookIcon />
-                <span className="icon-label">Learn more</span>
+              {moment >= 0 ? (
+                <button type="button" className="icon-btn" onClick={() => setDetails(true)} aria-label={`Learn more about ${shown.name}`}>
+                  <BookIcon />
+                  <span className="icon-label">Learn more</span>
+                </button>
+              ) : null}
+              <button type="button" className="icon-btn" onClick={() => setDrifting((d) => !d)} aria-label={drifting ? "Pause the drift" : "Keep drifting"} aria-pressed={!drifting}>
+                {drifting ? <PauseIcon /> : <PlayIcon />}
               </button>
               <button type="button" className="icon-btn" onClick={toggleMute} aria-label={muted ? "Turn sound on" : "Turn sound off"} aria-pressed={!muted}>
                 {muted ? <MuteIcon /> : <SoundIcon />}
               </button>
-              <button type="button" className="icon-btn" onClick={() => setScreen("map")} aria-label="Level map">
-                <MapIcon />
-              </button>
             </div>
           </div>
 
-          {status ? (
-            <div className="hud-status" aria-live="polite">
-              <span>{status.label}</span>
-              {status.chips ? (
-                <span className="chips">
-                  {status.chips.map((c) => (
-                    <abbr key={c.text} title={c.title} className={c.on ? "chip on" : "chip"}>
-                      {c.text}
-                    </abbr>
-                  ))}
-                </span>
-              ) : null}
+          {/* a thin line of time down the side: where you are in the story */}
+          <nav className="jt" aria-label="Moments in time">
+            <div className="jt-track" aria-hidden="true">
+              <div ref={fill} className="jt-fill" />
+            </div>
+            <ol>
+              {moments.map((m, i) => (
+                <li key={m.id} style={{ "--c": m.color, "--at": `${((i + 0.75) / (moments.length + 0.6)) * 100}%` } as React.CSSProperties}>
+                  <button type="button" className={i === moment ? "tl-dot on" : i < moment ? "tl-dot past" : "tl-dot"} onClick={() => goTo(i)} aria-current={i === moment ? "step" : undefined}>
+                    <span className="tl-label">{m.name}</span>
+                  </button>
+                </li>
+              ))}
+            </ol>
+          </nav>
+
+          {moment < 0 ? (
+            <p className="j-hint" key="hint">
+              {touch ? (
+                <>
+                  Just watch, or <strong>swipe up</strong> to travel faster through time.
+                </>
+              ) : (
+                <>
+                  Just watch, or <strong>scroll</strong> to travel faster through time. <strong>Move the mouse</strong> to look around.
+                </>
+              )}
+            </p>
+          ) : null}
+
+          {moment >= 0 && !ended ? (
+            <div className="caption" key={moment} aria-live="polite">
+              <p className="cap-line cap-when">{shown.when}</p>
+              <h2 className="cap-line cap-name">{shown.name}</h2>
+              <p className="cap-line cap-feel">{shown.feel}</p>
+              <p className="cap-line cap-fact">{shown.fact}</p>
             </div>
           ) : null}
 
-          {webgl ? null : <FlatScene key={`${level.id}-${attempt}`} level={level} onProgress={onProgress} onWin={onWin} sfx={sfx} />}
-
-          <div className="hud-bottom">
-            <p className="hud-goal" aria-live="polite">
-              <span className="goal-long">{level.goal}</span>
-              <span className="goal-short" aria-hidden="true">{level.goalShort}</span>
-            </p>
-            <div className="hud-bar-row">
-              <div ref={barValue} className="hud-bar" role="progressbar" aria-label="Level progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={0}>
-                <div ref={bar} className="hud-bar-fill" />
+          {ended ? (
+            <div className="caption end" aria-live="polite">
+              <p className="end-line cap-when">Chapter 1 · The end</p>
+              <h2 className="end-line cap-name">You are made of star stuff.</h2>
+              <p className="end-line cap-fact">
+                From a tiny hot speck to shining galaxies. The atoms in your body were cooked inside stars, long before the Sun was born.
+              </p>
+              <p className="end-line coming">
+                <span>Coming soon</span> {CHAPTER.next}
+              </p>
+              <div className="end-line card-actions">
+                <button type="button" className="btn btn-big btn-sm" onClick={again}>
+                  Travel again
+                </button>
+                <Link href="/sources" className="btn btn-ghost btn-sm">
+                  See the science
+                </Link>
               </div>
-              <button type="button" className="skip" onClick={skip}>
-                Skip
-              </button>
             </div>
-            {webgl ? <p className="sr-only">You can also play with the keyboard: press or hold Space.</p> : null}
+          ) : null}
+
+          <div className="j-steps">
+            <button type="button" className="icon-btn" onClick={() => goTo(Math.max(-1, moment - 1))} disabled={moment < 0} aria-label="Back in time">
+              <ArrowIcon back />
+            </button>
+            <button type="button" className="icon-btn" onClick={() => goTo(Math.min(moments.length - 1, moment + 1))} disabled={moment >= moments.length - 1} aria-label="Forward in time">
+              <ArrowIcon />
+            </button>
           </div>
         </div>
       ) : null}
 
-      {/* ---------------- level complete ---------------- */}
-      {screen === "won" && run ? (
-        <div className="screen won-screen">
-          <div className="card" role="dialog" aria-modal="false" aria-labelledby="won-title">
-            <p className="card-kicker">Level {level.number} complete!</p>
-            <h2 id="won-title" className="card-title">{level.win}</h2>
-            <ul className="stars-row" aria-label={`${starsOf(run)} of 3 stars`}>
-              <StarBadge on={run.finish} label="Finished" />
-              <StarBadge on={run.speed} label={run.speed ? `Speedy! ${Math.round(run.seconds)}s` : `Under ${level.par}s`} />
-              <StarBadge on={run.quiz === true} label={run.quiz === null ? "Quiz" : run.quiz ? "Quiz right!" : "Quiz"} />
-            </ul>
-            <p className="card-fact">{level.fact}</p>
-
-            <div className="quiz">
-              <p className="quiz-q">
-                <span className="quiz-tag">Quick quiz</span> {level.quiz.question}
-              </p>
-              <div className="quiz-answers">
-                {level.quiz.answers.map((a, i) => (
-                  <button
-                    key={a}
-                    type="button"
-                    className={`quiz-a${answer === null ? "" : i === level.quiz.correct ? " right" : i === answer ? " wrong" : ""}`}
-                    onClick={() => choose(i)}
-                    disabled={answer !== null}
-                  >
-                    {a}
-                  </button>
-                ))}
-              </div>
-              {answer !== null ? (
-                <p className="quiz-why" role="status">
-                  <strong>{answer === level.quiz.correct ? "Yes! " : "Not quite. "}</strong>
-                  {level.quiz.why}
-                </p>
-              ) : null}
-            </div>
-
-            <div className="card-actions">
-              <button type="button" className="btn btn-big" onClick={next} autoFocus>
-                {index + 1 < levels.length ? "Next level" : "Finish chapter"} <ArrowIcon />
-              </button>
-              <button type="button" className="btn btn-ghost" onClick={() => setDetails(true)}>
+      {/* ---------------- without WebGL: the same story as a simple scroll ---------------- */}
+      {started && webgl === false ? (
+        <div className="flat-journey">
+          {moments.map((m) => (
+            <section key={m.id} className="flat-moment" style={{ "--c": m.color } as React.CSSProperties}>
+              <p className="cap-when">{m.when}</p>
+              <h2 className="cap-name">{m.name}</h2>
+              <p className="cap-feel">{m.feel}</p>
+              <p className="cap-fact">{m.fact}</p>
+              <button
+                type="button"
+                className="btn btn-ghost btn-sm"
+                onClick={() => {
+                  setMoment(m.number - 1);
+                  setDetails(true);
+                }}
+              >
                 <BookIcon /> Learn more
               </button>
-              <button type="button" className="btn btn-ghost" onClick={() => go(index)}>
-                Play again
-              </button>
-            </div>
-          </div>
+            </section>
+          ))}
+          <section className="flat-moment">
+            <h2 className="cap-name">You are made of star stuff.</h2>
+            <Link href="/sources" className="btn btn-ghost btn-sm">
+              See the science
+            </Link>
+          </section>
         </div>
       ) : null}
 
-      {/* ---------------- chapter complete ---------------- */}
-      {screen === "end" ? (
-        <div className="screen won-screen">
-          <div className="card end-card">
-            <p className="card-kicker">Chapter 1 complete!</p>
-            <h2 className="card-title">You built the universe!</h2>
-            <p className="end-total">
-              <StarIcon on /> {total} of {levels.length * 3} stars
-            </p>
-            <p className="card-fact">
-              From a tiny hot speck to shining galaxies. The atoms that make you were cooked in stars like the ones you just built.
-              You really are made of star stuff.
-            </p>
-            <p className="coming">
-              <span className="quiz-tag">Coming soon</span> {CHAPTER.next}
-            </p>
-            <div className="card-actions">
-              <button type="button" className="btn btn-big" onClick={() => setScreen("map")}>
-                Level map
-              </button>
-              <button type="button" className="btn btn-ghost" onClick={() => go(0)}>
-                Play again
-              </button>
-              <Link href="/sources" className="btn btn-ghost">
-                See the science
-              </Link>
-            </div>
-          </div>
-        </div>
-      ) : null}
-
-      <DetailsPanel level={level} open={details} onClose={() => setDetails(false)} />
+      <DetailsPanel moment={shown} open={details} onClose={() => setDetails(false)} />
     </div>
   );
 }
@@ -476,7 +345,7 @@ function Settings({
           </button>
         </div>
       ) : webgl === false ? (
-        <p className="seg-label">Simple mode: this device can&rsquo;t show 3D, so the game uses flat pictures.</p>
+        <p className="seg-label">Simple mode: this device can&rsquo;t show 3D, so you will see pictures and words instead.</p>
       ) : null}
       <button type="button" className="btn btn-ghost btn-sm" onClick={toggleMute} aria-pressed={!muted}>
         {muted ? <MuteIcon /> : <SoundIcon />} Sound {muted ? "off" : "on"}
@@ -489,24 +358,7 @@ function Settings({
   );
 }
 
-function StarBadge({ on, label }: { on: boolean; label: string }) {
-  return (
-    <li className={on ? "star-badge on" : "star-badge"}>
-      <StarIcon on={on} big />
-      <span>{label}</span>
-    </li>
-  );
-}
-
 /* ---------------- icons (inline, no icon font) ---------------- */
-function StarIcon({ on, big }: { on: boolean; big?: boolean }) {
-  const s = big ? 44 : 18;
-  return (
-    <svg aria-hidden="true" width={s} height={s} viewBox="0 0 24 24" className={on ? "star on" : "star"}>
-      <path d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 17.4l-5.9 3.1 1.2-6.5L2.5 9.4l6.6-.9z" />
-    </svg>
-  );
-}
 const svg = { "aria-hidden": true, width: 20, height: 20, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round", strokeLinejoin: "round" } as const;
 function PlayIcon() {
   return (
@@ -515,10 +367,17 @@ function PlayIcon() {
     </svg>
   );
 }
-function ArrowIcon() {
+function ArrowIcon({ back }: { back?: boolean }) {
   return (
-    <svg {...svg}>
+    <svg {...svg} style={back ? { transform: "rotate(180deg)" } : undefined}>
       <path d="M5 12h14M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+function PauseIcon() {
+  return (
+    <svg {...svg} fill="currentColor" stroke="none">
+      <path d="M6 4.5h4v15H6zM14 4.5h4v15h-4z" />
     </svg>
   );
 }
@@ -543,20 +402,4 @@ function MuteIcon() {
     </svg>
   );
 }
-function MapIcon() {
-  return (
-    <svg {...svg}>
-      <path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2zM9 4v14M15 6v14" />
-    </svg>
-  );
-}
-function LockIcon() {
-  return (
-    <svg {...svg} width={26} height={26}>
-      <rect x="5" y="11" width="14" height="10" rx="2" />
-      <path d="M8 11V8a4 4 0 018 0v3" />
-    </svg>
-  );
-}
 
-export type { Level };
