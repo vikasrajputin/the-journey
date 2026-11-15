@@ -3,19 +3,19 @@ import { PageIntro } from "@/components/layout/PageIntro";
 import { SourceLine } from "@/components/content/SourceCitation";
 import { SourceFilter } from "@/components/content/SourceFilter";
 import { sources } from "@/data/sources";
-import { levels } from "@/components/game/levels";
+import { moments } from "@/components/game/moments";
 import type { Source } from "@/lib/content-schema";
 
 export const metadata: Metadata = {
   title: "Sources",
-  description: "The science behind the Chapter 1 game, level by level: research, museum, university and government sources, each checked against the claim it supports.",
+  description: "The science behind Chapter 1, moment by moment: research, museum, university and government sources, each checked against the claim it supports.",
   alternates: { canonical: "/sources" },
 };
 
 const byId = new Map(sources.map((s) => [s.id, s]));
-const groups = levels.map((l) => ({
-  id: `level-${l.id}`,
-  title: `Level ${l.number}: ${l.name}`,
+const groups = moments.map((l) => ({
+  id: `moment-${l.id}`,
+  title: `${l.number}. ${l.name}`,
   list: l.sourceIds
     .map((id) => byId.get(id))
     .filter((s): s is Source => Boolean(s)),
@@ -39,7 +39,7 @@ export default function SourcesPage() {
     <>
       <PageIntro eyebrow="Sources" title="Where the story comes from">
         <p>
-          Every fact in the Chapter 1 game comes from here, level by level. Every source was found on its
+          Every fact in Chapter 1 comes from here, moment by moment. Every source was found on its
           publisher&rsquo;s own site; {checked} of {sources.length} have been re-read against the exact claim they support.
         </p>
       </PageIntro>

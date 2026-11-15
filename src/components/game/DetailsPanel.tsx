@@ -2,13 +2,13 @@
 
 import { useEffect, useRef } from "react";
 import { getSource } from "@/data/sources";
-import type { Level } from "./levels";
+import type { Moment } from "./moments";
 
 /**
- * "Learn more": the longer explanation and the proof behind a level.
- * Kept out of the way so the game stays a game; one tap opens it.
+ * "Learn more": the longer explanation and the proof behind a moment.
+ * Kept out of the way so the journey stays a journey; one tap opens it.
  */
-export function DetailsPanel({ level, open, onClose }: { level: Level; open: boolean; onClose: () => void }) {
+export function DetailsPanel({ moment: level, open, onClose }: { moment: Moment; open: boolean; onClose: () => void }) {
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -33,7 +33,7 @@ export function DetailsPanel({ level, open, onClose }: { level: Level; open: boo
       <div className="details-inner">
         <div className="details-head">
           <p className="details-kicker">
-            Level {level.number} · {level.when}
+            {level.when}
           </p>
           <button type="button" className="icon-btn" onClick={onClose} aria-label="Close">
             <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round">
@@ -48,7 +48,7 @@ export function DetailsPanel({ level, open, onClose }: { level: Level; open: boo
           </p>
         ))}
         <p className="details-note">
-          The 3D scene in this level is a simulation made for the game. It shows the idea, not a real photo or an exact model.
+          What you saw is a simulation made for this journey. It shows the idea, not a real photo or an exact model.
         </p>
         <h3 className="details-h3">How do we know?</h3>
         <ul className="details-sources">
