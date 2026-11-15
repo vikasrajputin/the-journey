@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { count } from "../quality";
-import { glowTexture, pointCloud, randomInSphere, type SceneProps } from "../shared";
+import { glowTexture, pointCloud, randomInSphere, type SceneProps, shake } from "../shared";
 import { useActionKey, useStagePointer } from "../input";
 
 /** The fusion ladder of a big star, simplified. Each step needs a hotter, squeezed core. */
@@ -145,9 +145,9 @@ export function Forge({ quality, onProgress, onWin, onStatus, sfx, still }: Scen
         (ring.current.material as THREE.MeshBasicMaterial).opacity = Math.max(0, 1 - age * 0.7);
       }
       if (!still && age < 0.7) {
-        camera.position.x = (Math.random() - 0.5) * 0.2;
-        camera.position.y = (Math.random() - 0.5) * 0.2;
-      } else camera.position.x = camera.position.y = 0;
+        shake.x = (Math.random() - 0.5) * 0.2;
+        shake.y = (Math.random() - 0.5) * 0.2;
+      } else shake.x = shake.y = 0;
       onProgress(Math.min(1, 0.75 + age / 2.4));
       if (age > 2.4 && !st.done) {
         st.done = true;

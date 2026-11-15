@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef } from "react";
 import { useFrame, useThree } from "@react-three/fiber";
 import * as THREE from "three";
 import { count, type Quality } from "../quality";
-import { glowTexture, pointCloud, randomInSphere, type SceneProps } from "../shared";
+import { glowTexture, pointCloud, randomInSphere, type SceneProps, shake } from "../shared";
 import { useActionKey, useStagePointer } from "../input";
 
 const HOT = ["#ffffff", "#fff3b0", "#ffd23f", "#ff9f1c", "#ff5d8f", "#c49bff", "#3ee0ff"];
@@ -56,10 +56,10 @@ export function Bang({ quality, onProgress, onWin, sfx, still }: SceneProps) {
       st.charge = THREE.MathUtils.clamp(st.charge + (st.holding ? dt / 1.8 : -dt / 2.5), 0, 1);
       onProgress(st.charge * 0.6);
       const pulse = 1 + Math.sin(t * (4 + st.charge * 18)) * (0.08 + st.charge * 0.12);
-      const shake = still ? 0 : st.charge * 0.04;
+      const jitter = still ? 0 : st.charge * 0.04;
       if (dot.current) {
         dot.current.scale.setScalar((0.6 + st.charge * 1.6) * pulse);
-        dot.current.position.set((Math.random() - 0.5) * shake, (Math.random() - 0.5) * shake, 0);
+        dot.current.position.set((Math.random() - 0.5) * jitter, (Math.random() - 0.5) * jitter, 0);
       }
       if (ring.current) {
         const m = ring.current.material as THREE.MeshBasicMaterial;
@@ -93,10 +93,10 @@ export function Bang({ quality, onProgress, onWin, sfx, still }: SceneProps) {
       m.opacity = still ? 0 : Math.max(0, 1 - age * 1.6);
     }
     if (!still && age < 0.8) {
-      camera.position.x = (Math.random() - 0.5) * 0.25 * (1 - age / 0.8);
-      camera.position.y = (Math.random() - 0.5) * 0.25 * (1 - age / 0.8);
+      shake.x = (Math.random() - 0.5) * 0.25 * (1 - age / 0.8);
+      shake.y = (Math.random() - 0.5) * 0.25 * (1 - age / 0.8);
     } else {
-      camera.position.x = camera.position.y = 0;
+      shake.x = shake.y = 0;
     }
     onProgress(Math.min(1, 0.6 + age / 2.5));
     if (age > 2.6 && !st.done) {

@@ -5,6 +5,7 @@
  */
 
 export type Soundscape =
+  | "garden"
   | "cosmos"
   | "forge"
   | "deep"
@@ -16,7 +17,7 @@ export type Soundscape =
   | "modern"
   | "heart";
 
-export type Sfx = "bang" | "impact" | "roar" | "divide" | "spark" | "shimmer" | "step" | "plant" | "chime" | "whoosh" | "stencil";
+export type Sfx = "bang" | "impact" | "roar" | "divide" | "spark" | "shimmer" | "step" | "plant" | "chime" | "whoosh" | "stencil" | "bump" | "portal";
 
 type Layer = { out: GainNode; stop: () => void };
 
@@ -33,6 +34,7 @@ export class SoundEngine {
   private brown: AudioBuffer;
   private current?: { id: Soundscape; layer: Layer };
   private muted = false;
+  private rush?: { gain: GainNode; filter: BiquadFilterNode };
 
   constructor() {
     const AC = window.AudioContext ?? (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
@@ -74,6 +76,25 @@ export class SoundEngine {
     const t = this.ctx.currentTime;
     this.bed.gain.cancelScheduledValues(t);
     this.bed.gain.setTargetAtTime(v, t, 0.8);
+  }
+
+  /**
+   * Wind-like rush that follows how fast the player flies on the universe map
+   * (0 = still, 1 = full speed). Built the first time it is needed.
+   */
+  setRush(v: number) {
+    const c = this.ctx;
+    if (!this.rush) {
+      const s = this.src(this.brown);
+      const filter = this.filter("bandpass", 300, 0.9);
+      const gain = this.gain(0);
+      s.connect(filter).connect(gain).connect(this.bed);
+      this.rush = { gain, filter };
+    }
+    const t = c.currentTime;
+    const k = Math.max(0, Math.min(1, v));
+    this.rush.gain.gain.setTargetAtTime(0.55 * Math.pow(k, 1.2), t, 0.3);
+    this.rush.filter.frequency.setTargetAtTime(220 + k * 900, t, 0.3);
   }
 
   isMuted() {
@@ -279,6 +300,45 @@ export class SoundEngine {
     };
 
     switch (id) {
+      case "garden": {
+        // A slow chord of stacked fifths. Each note is a pair of sines tuned a hair
+        // apart, so they gently beat against each other, and all of it sits in a big echo.
+        const pad = this.gain(1);
+        pad.connect(out);
+        toVerb(pad, 1.4);
+        [73.42, 110, 164.81, 246.94, 369.99].forEach((f, i) => {
+          const g = this.gain(0.03 - i * 0.004);
+          g.connect(pad);
+          keep(this.osc("sine", f)).connect(g);
+          keep(this.osc("sine", f + rand(0.04, 0.12))).connect(g);
+        });
+        const hum = bed(this.brown, "lowpass", 150, 0.22, 0.07, 0.08);
+        keep(this.lfo(hum.gain, 0.113, 0.06));
+        // Sparkles: notes from a five-note scale, so any two always sound nice together.
+        const scale = [0, 2, 5, 7, 9, 12, 14, 17, 19];
+        timers.push(
+          this.every(2.5, 8, () => {
+            const f = 440 * Math.pow(2, scale[Math.floor(rand(0, scale.length))] / 12);
+            const pan = c.createStereoPanner();
+            pan.pan.value = rand(-0.7, 0.7);
+            pan.connect(out);
+            this.tone(pan, { f0: f, d: 4.5, v: rand(0.02, 0.04), a: 0.03, send: 1.3 });
+          }),
+        );
+        // Every now and then, a far-off "song of space": two or three slow sliding notes.
+        timers.push(
+          this.every(18, 40, () => {
+            let at = c.currentTime;
+            for (let n = 2 + Math.floor(rand(0, 2)); n--; ) {
+              const f = rand(170, 380);
+              const d = rand(1.6, 3);
+              this.tone(out, { type: "triangle", f0: f, f1: f * rand(0.6, 1.6), a: d * 0.4, d, v: 0.05, at, send: 2 });
+              at += d * 0.8;
+            }
+          }),
+        );
+        break;
+      }
       case "cosmos": {
         drone([55, 82.5, 110.3, 164.8], "sine", 700, 0.16);
         bed(this.pink, "bandpass", 2400, 0.03, 0.05, 0.02);
@@ -477,6 +537,14 @@ export class SoundEngine {
         break;
       case "whoosh":
         this.burst(d, { type: "bandpass", f0: 300, f1: 3000, q: 1.5, a: 0.5, d: 0.6, v: 0.25, send: 0.6 });
+        break;
+      case "bump":
+        this.tone(d, { f0: 180, f1: 90, d: 0.25, v: 0.25, send: 0.4 });
+        this.burst(d, { buf: this.brown, f0: 500, f1: 120, d: 0.3, v: 0.3 });
+        break;
+      case "portal":
+        this.burst(d, { type: "bandpass", f0: 200, f1: 5000, q: 1.2, a: 0.4, d: 0.9, v: 0.35, send: 1.2 });
+        for (const [i, f] of [587, 880, 1175, 1760].entries()) this.tone(d, { f0: f, d: 1.4, v: 0.06, at: c.currentTime + i * 0.07, send: 1.4 });
         break;
       case "stencil":
         this.burst(d, { type: "bandpass", f0: 3000, q: 0.8, a: 0.05, d: 0.35, v: 0.12 });

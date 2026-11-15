@@ -5,6 +5,8 @@ const PORT = Number(process.env.PORT ?? 3100);
 export default defineConfig({
   testDir: "tests/e2e",
   fullyParallel: true,
+  // the 3D game renders in software in CI and headless browsers, which is slow
+  timeout: 60_000,
   reporter: process.env.CI ? "github" : "list",
   use: {
     baseURL: `http://localhost:${PORT}`,

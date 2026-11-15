@@ -3,7 +3,8 @@ import { expect, test } from "@playwright/test";
 test("plays level 1 with the keyboard, answers the quiz and moves on", async ({ page }) => {
   await page.goto("/");
   await page.getByRole("button", { name: "Play" }).click();
-  await expect(page.getByText("Level 1/7")).toBeVisible({ timeout: 5000 });
+  // Play first flies you into the level's portal, then through the warp.
+  await expect(page.getByText("Level 1/7")).toBeVisible({ timeout: 10000 });
   await page.locator(".game").focus();
   await page.keyboard.down("Space");
   await page.waitForTimeout(2300);

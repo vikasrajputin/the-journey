@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import gsap from "gsap";
@@ -12,6 +12,7 @@ import type { SoundEngine, Sfx } from "./sound-engine";
 import type { StageMode } from "./Stage";
 import { FlatScene } from "./FlatScene";
 import { DetailsPanel } from "./DetailsPanel";
+import type { PortalInfo } from "./world/Hub";
 
 const Stage = dynamic(() => import("./Stage"), { ssr: false });
 
@@ -34,6 +35,16 @@ export function Game() {
   const [run, setRun] = useState<RunStars | null>(null);
   const [answer, setAnswer] = useState<number | null>(null);
   const [details, setDetails] = useState(false);
+  // universe map
+  const [ready, setReady] = useState(false);
+  const [hubTarget, setHubTarget] = useState<number | null>(null);
+  const [near, setNear] = useState<{ index: number; locked: boolean } | null>(null);
+  const [startAt, setStartAt] = useState(0);
+  const [flown, setFlown] = useState(false);
+  const [lost, setLost] = useState(false);
+  const [recall, setRecall] = useState(0);
+  const [touch, setTouch] = useState(false);
+  const motion = useRef(0);
 
   const level = levels[index];
   const sound = useRef<SoundEngine | null>(null);
@@ -49,6 +60,7 @@ export function Game() {
     const q = loadPref("graphics");
     setQuality(q === "high" || q === "low" ? q : detectQuality());
     setMuted(loadPref("muted") === "1");
+    setTouch(window.matchMedia("(pointer: coarse)").matches);
     const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
     const sync = () => setStill(mq.matches || document.documentElement.hasAttribute("data-motion"));
     sync();
@@ -87,6 +99,8 @@ export function Game() {
   const go = useCallback(
     (i: number) => {
       void ensureSound().then((s) => s?.play(levels[i].id === "forge" ? "forge" : "cosmos"));
+      setHubTarget(null);
+      setNear(null);
       sfx("whoosh");
       setIndex(i);
       setAttempt((a) => a + 1);
@@ -152,10 +166,73 @@ export function Game() {
     });
     next();
   };
+  /** Glide to a portal on the universe map and fly in; without 3D, go straight there. */
+  const flyTo = (i: number) => {
+    if (!unlocked(progress, i)) return;
+    if (!webgl || still) return go(i);
+    void ensureSound().then((s) => s?.play("garden"));
+    sfx("whoosh");
+    setHubTarget(i);
+  };
   const play = () => {
     const first = levels.findIndex((_, i) => unlocked(progress, i) && progress[levels[i].id] === undefined);
-    go(first === -1 ? 0 : first);
+    flyTo(first === -1 ? 0 : first);
   };
+  const openMap = (at = startAt) => {
+    setStartAt(at);
+    setHubTarget(null);
+    setScreen("map");
+    void ensureSound().then((s) => s?.play("garden"));
+  };
+  const onEnter = useCallback(
+    (i: number) => {
+      sfx("portal");
+      go(i);
+    },
+    [go, sfx],
+  );
+  const onBump = useCallback(() => sfx("bump"), [sfx]);
+  const onReady = useCallback(() => setReady(true), []);
+
+  // If the glide to a portal takes too long (a slow device), go in anyway.
+  useEffect(() => {
+    if (hubTarget === null) return;
+    const t = window.setTimeout(() => go(hubTarget), 3200);
+    return () => window.clearTimeout(t);
+  }, [hubTarget, go]);
+
+  // Show the title buttons even if the 3D world is slow to start.
+  useEffect(() => {
+    if (webgl === false) setReady(true);
+    const t = window.setTimeout(() => setReady(true), 3000);
+    return () => window.clearTimeout(t);
+  }, [webgl]);
+
+  // The rush of air follows your flying speed on the map.
+  const onHub = screen === "title" || screen === "map" || screen === "end";
+  useEffect(() => {
+    if (!onHub) {
+      sound.current?.setRush(0);
+      return;
+    }
+    const t = window.setInterval(() => sound.current?.setRush(motion.current), 100);
+    return () => window.clearInterval(t);
+  }, [onHub]);
+
+  // The first time you fly, the "how to fly" hint fades away.
+  useEffect(() => {
+    if (screen !== "map" || flown) return;
+    const t = window.setInterval(() => motion.current > 0.25 && setFlown(true), 300);
+    return () => window.clearInterval(t);
+  }, [screen, flown]);
+
+  // Esc on the map goes back to the title.
+  useEffect(() => {
+    if (screen !== "map") return;
+    const k = (e: KeyboardEvent) => e.key === "Escape" && !details && setScreen("title");
+    window.addEventListener("keydown", k);
+    return () => window.removeEventListener("keydown", k);
+  }, [screen, details]);
 
   const setGraphics = (q: Quality) => {
     setQuality(q);
@@ -202,27 +279,56 @@ export function Game() {
         gsap.from(".card", { y: 50, opacity: 0, duration: 0.55, ease: "back.out(1.4)" });
         gsap.from(".star-badge", { scale: 0, rotate: -90, duration: 0.5, delay: 0.3, stagger: 0.15, ease: "back.out(3)" });
       }
-      if (screen === "map") gsap.from(".map-node", { y: 30, opacity: 0, duration: 0.45, stagger: 0.06, ease: "back.out(1.6)" });
+      if (screen === "map") gsap.from(".map-node", { y: 30, opacity: 0, duration: 0.45, stagger: 0.05, ease: "back.out(1.6)" });
     }, el);
     return () => ctx.revert();
   }, [screen, still]);
 
-  const mode: StageMode =
-    screen === "title" || screen === "map" || screen === "end"
-      ? { kind: "title" }
-      : screen === "warp"
-        ? { kind: "warp", color: level.color }
-        : { kind: "level", id: level.id, attempt };
+  const portals = useMemo<PortalInfo[]>(
+    () => levels.map((l, i) => ({ color: l.color, number: l.number, name: l.name, unlocked: unlocked(progress, i), stars: progress[l.id] })),
+    [progress],
+  );
+
+  const mode: StageMode = onHub
+    ? {
+        kind: "hub",
+        hub: {
+          portals,
+          mode: screen === "map" ? "fly" : "idle",
+          target: hubTarget,
+          startAt,
+          onNear: setNear,
+          onEnter,
+          onBump,
+          onPick: flyTo,
+          onLost: setLost,
+          recall,
+          motion,
+        },
+      }
+    : screen === "warp"
+      ? { kind: "warp", color: level.color }
+      : { kind: "level", id: level.id, attempt, color: level.color };
 
   const total = levels.reduce((n, l) => n + (progress[l.id] ?? 0), 0);
+  const nearLevel = near ? levels[near.index] : null;
 
   return (
-    <div ref={root} className="game" style={{ "--lvl": level.color } as React.CSSProperties} data-screen={screen}>
+    <div
+      ref={root}
+      className="game"
+      style={{ "--lvl": nearLevel?.color ?? level.color } as React.CSSProperties}
+      data-screen={screen}
+      data-ready={ready ? "" : undefined}
+      data-diving={hubTarget !== null ? "" : undefined}
+      data-quality={quality}
+    >
       {webgl ? (
         <Stage
-          mode={screen === "won" ? { kind: "level", id: level.id, attempt } : mode}
+          mode={mode}
           quality={quality}
           onSlow={onSlow}
+          onReady={onReady}
           onProgress={onProgress}
           onWin={onWin}
           onStatus={setStatus}
@@ -243,11 +349,17 @@ export function Game() {
             Chapter 1 · <strong>{CHAPTER.title}</strong>
           </p>
           <p className="title-tag title-word">{CHAPTER.tagline}</p>
+          <div className="title-load" aria-hidden={ready ? true : undefined}>
+            <div className="load-bar" role="progressbar" aria-label="Building the universe" aria-valuetext={ready ? "Ready" : "Loading"}>
+              <span />
+            </div>
+            <p className="load-text">Building the universe…</p>
+          </div>
           <div className="title-actions">
-            <button type="button" className="btn btn-big" onClick={play}>
+            <button type="button" className="btn btn-big" onClick={play} disabled={hubTarget !== null}>
               <PlayIcon /> {total > 0 ? "Keep playing" : "Play"}
             </button>
-            <button type="button" className="btn btn-ghost" onClick={() => setScreen("map")}>
+            <button type="button" className="btn btn-ghost" onClick={() => openMap()} disabled={hubTarget !== null}>
               Pick a level
             </button>
           </div>
@@ -255,9 +367,9 @@ export function Game() {
         </div>
       ) : null}
 
-      {/* ---------------- level map ---------------- */}
+      {/* ---------------- universe map: fly through space, the levels are portals ---------------- */}
       {screen === "map" ? (
-        <div className="screen map-screen">
+        <div className="screen map-screen hub-screen">
           <div className="map-head">
             <button type="button" className="btn btn-ghost btn-sm" onClick={() => setScreen("title")}>
               ← Back
@@ -267,13 +379,61 @@ export function Game() {
               <StarIcon on /> {total} / {levels.length * 3}
             </p>
           </div>
-          <ol className="map-path">
+
+          {webgl ? (
+            <p className={flown || nearLevel ? "hub-hint gone" : "hub-hint"} aria-hidden={flown ? true : undefined}>
+              {touch ? (
+                <>
+                  <strong>Hold</strong> to fly. <strong>Slide</strong> to steer. Fly into a glowing ball to play!
+                </>
+              ) : (
+                <>
+                  <strong>Hold the mouse</strong> to fly and <strong>drag</strong> to steer, or use <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd>. Fly into a
+                  glowing ball to play!
+                </>
+              )}
+            </p>
+          ) : null}
+
+          {nearLevel && near && hubTarget === null ? (
+            <div className="hub-near" style={{ "--c": nearLevel.color } as React.CSSProperties} aria-live="polite">
+              <p className="hub-near-kicker">Level {nearLevel.number}</p>
+              <p className="hub-near-name">{nearLevel.name}</p>
+              <p className="hub-near-when">{nearLevel.when}</p>
+              {near.locked ? (
+                <p className="hub-near-lock">
+                  <LockIcon /> Locked. Finish Level {nearLevel.number - 1} first.
+                </p>
+              ) : (
+                <button type="button" className="btn btn-big btn-sm" onClick={() => flyTo(near.index)}>
+                  Fly in <ArrowIcon />
+                </button>
+              )}
+            </div>
+          ) : null}
+
+          {lost && hubTarget === null ? (
+            <button
+              type="button"
+              className="btn btn-big btn-sm hub-back"
+              onClick={() => {
+                const last = levels.reduce((n, _, i) => (unlocked(progress, i) ? i : n), 0);
+                setStartAt(last);
+                setRecall((r) => r + 1);
+                sfx("whoosh");
+              }}
+            >
+              Lost in space? Take me back
+            </button>
+          ) : null}
+
+          <ol className="map-path hub-strip" aria-label="Levels">
             {levels.map((l, i) => {
               const open = unlocked(progress, i);
               const got = progress[l.id];
               return (
-                <li key={l.id} className="map-node" style={{ "--c": l.color } as React.CSSProperties}>
-                  <button type="button" className="map-btn" disabled={!open} onClick={() => go(i)}>
+                <li key={l.id} className="map-node" style={{ "--c": l.color } as React.CSSProperties} data-near={near?.index === i ? "" : undefined}>
+                  <button type="button" className="map-btn" disabled={!open || (hubTarget !== null && hubTarget !== i)} onClick={() => flyTo(i)}>
                     <span className="map-orb" aria-hidden="true">
                       {open ? l.number : <LockIcon />}
                     </span>
@@ -320,7 +480,7 @@ export function Game() {
               <button type="button" className="icon-btn" onClick={toggleMute} aria-label={muted ? "Turn sound on" : "Turn sound off"} aria-pressed={!muted}>
                 {muted ? <MuteIcon /> : <SoundIcon />}
               </button>
-              <button type="button" className="icon-btn" onClick={() => setScreen("map")} aria-label="Level map">
+              <button type="button" className="icon-btn" onClick={() => openMap(index)} aria-label="Level map">
                 <MapIcon />
               </button>
             </div>
@@ -431,7 +591,7 @@ export function Game() {
               <span className="quiz-tag">Coming soon</span> {CHAPTER.next}
             </p>
             <div className="card-actions">
-              <button type="button" className="btn btn-big" onClick={() => setScreen("map")}>
+              <button type="button" className="btn btn-big" onClick={() => openMap(levels.length - 1)}>
                 Level map
               </button>
               <button type="button" className="btn btn-ghost" onClick={() => go(0)}>

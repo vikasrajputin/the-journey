@@ -829,3 +829,310 @@ html:not([data-js]) .game {
 html[data-js] .game-nojs {
   display: none;
 }
+
+/* ================================================================
+ * Immersive layer (universe map, title reveal, transitions)
+ * ================================================================ */
+
+/* The 3D world is always running. Behind the title it is dimmed, blurred and a
+   little zoomed in; pressing Play brings it into focus as you dive in. Phones
+   skip the blur (too slow there) and only dim. */
+.game-canvas {
+  transition: filter 1.1s var(--ease-out), transform 1.4s var(--ease-out), opacity 1.6s;
+}
+.game:not([data-ready]) .game-canvas {
+  opacity: 0;
+}
+.game[data-screen="title"] .game-canvas,
+.game[data-screen="end"] .game-canvas {
+  filter: blur(6px) brightness(0.6) saturate(1.2);
+  transform: scale(1.06);
+}
+.game[data-screen="title"][data-diving] .game-canvas {
+  filter: none;
+  transform: none;
+}
+@media (pointer: coarse) {
+  .game[data-screen="title"] .game-canvas,
+  .game[data-screen="end"] .game-canvas {
+    filter: brightness(0.6);
+  }
+}
+.game[data-screen="title"][data-diving] .title-screen,
+.game[data-screen="title"][data-diving] .title {
+  opacity: 0;
+  transform: scale(1.15);
+  transition: opacity 0.6s, transform 0.8s var(--ease-out);
+}
+
+/* A soft dark edge on Lite graphics, where there is no post-processing. */
+.game[data-quality="low"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 55%, rgb(2 0 10 / 0.6));
+  z-index: 1;
+}
+.game > .screen,
+.game > .hud,
+.game > .title {
+  z-index: 2;
+}
+
+/* loading bar: glides on its own while the world is being built */
+.title-load {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  width: min(80vw, 20rem);
+  transition: opacity 0.6s, visibility 0.6s;
+}
+.load-bar {
+  width: 100%;
+  height: 10px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgb(10 4 30 / 0.8);
+  box-shadow: 0 0 0 2px rgb(255 225 77 / 0.5), 0 0 24px rgb(255 120 40 / 0.5);
+}
+.load-bar span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, #ff3d7f, #ffb020, #ffe14d);
+  transform-origin: 0 50%;
+  animation: load-fill 3s cubic-bezier(0.2, 0.7, 0.2, 1) forwards;
+}
+@keyframes load-fill {
+  from { transform: scaleX(0.02); }
+  to { transform: scaleX(0.9); }
+}
+.game[data-ready] .load-bar span {
+  animation: none;
+  transform: scaleX(1);
+}
+.load-text {
+  margin: 0;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: #ffe14d;
+}
+.title-screen .title-actions {
+  transition: opacity 0.5s, visibility 0.5s;
+}
+.game:not([data-ready]) .title-actions,
+.game:not([data-ready]) .settings,
+.game[data-ready] .title-load {
+  opacity: 0;
+  visibility: hidden;
+}
+.game[data-ready] .title-load {
+  position: absolute;
+}
+
+/* ---------------- universe map ---------------- */
+.hub-screen {
+  justify-content: space-between;
+  overflow: visible;
+  background: none;
+  pointer-events: none;
+}
+.hub-screen > * {
+  pointer-events: auto;
+}
+.hub-screen .map-head {
+  width: min(100%, 60rem);
+  padding: 0.5rem 0.75rem;
+  border-radius: 1.5rem;
+  background: linear-gradient(180deg, rgb(5 1 15 / 0.7), rgb(5 1 15 / 0.2));
+}
+.hub-hint {
+  margin: auto 0 0;
+  max-width: 34rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 1rem;
+  background: rgb(10 4 30 / 0.72);
+  border: 2px solid rgb(255 255 255 / 0.2);
+  text-align: center;
+  font-weight: 600;
+  pointer-events: none !important;
+  transition: opacity 0.8s, transform 0.8s;
+}
+.hub-hint strong {
+  color: #ffe14d;
+}
+.hub-hint kbd {
+  display: inline-block;
+  min-width: 1.6em;
+  padding: 0 0.3em;
+  border-radius: 0.35em;
+  background: #fff;
+  color: var(--ink);
+  font: 800 0.85em/1.6 system-ui, sans-serif;
+  box-shadow: inset 0 -0.15em rgb(0 0 0 / 0.3);
+}
+.hub-hint.gone {
+  opacity: 0;
+  transform: translateY(10px);
+}
+.hub-near {
+  position: absolute;
+  left: 50%;
+  bottom: calc(max(16px, env(safe-area-inset-bottom)) + 7.5rem);
+  transform: translateX(-50%);
+  display: grid;
+  justify-items: center;
+  gap: 0.2rem;
+  min-width: min(88vw, 18rem);
+  padding: 0.8rem 1.2rem 1rem;
+  border-radius: 1.5rem;
+  border: 3px solid var(--c);
+  background: rgb(10 4 30 / 0.82);
+  box-shadow: 0 0 40px color-mix(in srgb, var(--c) 45%, transparent);
+  text-align: center;
+  animation: near-in 0.35s var(--ease-out);
+}
+@keyframes near-in {
+  from { opacity: 0; transform: translate(-50%, 16px) scale(0.92); }
+}
+.hub-near p {
+  margin: 0;
+}
+.hub-near-kicker {
+  font-size: 0.75rem;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--c);
+}
+.hub-near-name {
+  font-size: clamp(1.3rem, 5vw, 1.8rem);
+  font-weight: 900;
+  line-height: 1.05;
+}
+.hub-near-when {
+  color: #ffe14d;
+  font-weight: 700;
+  margin-bottom: 0.4rem !important;
+}
+.hub-near-lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-weight: 700;
+  color: rgb(255 255 255 / 0.85);
+}
+.hub-near-lock svg {
+  width: 18px;
+  height: 18px;
+}
+.hub-near .btn-big {
+  --lvl: var(--c);
+}
+
+/* the level strip at the bottom: quick travel, and the keyboard/screen reader way to pick */
+.hub-strip {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  width: min(100%, 60rem);
+  margin: 0;
+  padding: 0.5rem;
+  border-radius: 1.5rem;
+  background: rgb(5 1 15 / 0.6);
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+.hub-strip .map-node,
+.hub-strip .map-node:nth-child(even),
+.hub-strip .map-node:nth-child(odd) {
+  padding: 0;
+  flex: 1 1 0;
+  min-width: 0;
+}
+.hub-strip .map-btn {
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 0.4rem 0.2rem 0.5rem;
+  border-width: 2px;
+  border-radius: 1rem;
+  text-align: center;
+  box-shadow: none;
+  background: rgb(10 4 30 / 0.7);
+}
+.hub-strip .map-node[data-near] .map-btn {
+  background: color-mix(in srgb, var(--c) 30%, rgb(10 4 30));
+  transform: translateY(-4px);
+}
+.hub-strip .map-orb {
+  width: 2.4rem;
+  height: 2.4rem;
+  font-size: 1.1rem;
+}
+.hub-strip .map-orb svg {
+  width: 18px;
+  height: 18px;
+}
+.hub-strip .map-text {
+  justify-items: center;
+}
+.hub-strip .map-name {
+  font-size: 0.78rem;
+  line-height: 1.1;
+}
+.hub-strip .map-when {
+  display: none;
+}
+.hub-strip .map-got svg {
+  width: 12px;
+  height: 12px;
+}
+@media (max-width: 720px) {
+  .hub-strip {
+    gap: 0.3rem;
+    padding: 0.35rem;
+  }
+  .hub-strip .map-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  .hub-strip .map-btn {
+    padding: 0.3rem 0;
+  }
+  .hub-strip .map-orb {
+    width: 2.1rem;
+    height: 2.1rem;
+  }
+  .hub-screen .map-title {
+    font-size: 1.05rem;
+  }
+  .hub-near {
+    bottom: calc(max(16px, env(safe-area-inset-bottom)) + 4.5rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-canvas,
+  .hub-hint,
+  .title-load {
+    transition: none;
+  }
+  .load-bar span,
+  .hub-near {
+    animation: none;
+  }
+}
+.hub-back {
+  position: absolute;
+  left: 50%;
+  top: 42%;
+  transform: translateX(-50%);
+  animation: near-in 0.35s var(--ease-out);
+  white-space: nowrap;
+}
